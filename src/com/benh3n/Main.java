@@ -1,7 +1,11 @@
 package com.benh3n;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Main extends JPanel{
 
@@ -16,8 +20,14 @@ public class Main extends JPanel{
     }
 
     public static void main(String[] args) {
-        // JFrame.setDefaultLookAndFeelDecorated(true);
+
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("icon.png"));
+        } catch (IOException e) { System.out.println("Image Load Failed!!"); }
+
         JFrame frame = new JFrame("3D Graphics Engine");
+        frame.setIconImage(img);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(Color.BLACK);
         frame.setSize(500, 500);
@@ -26,7 +36,7 @@ public class Main extends JPanel{
         frame.add(panel);
         frame.setVisible(true);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 999; i++) {
             x[0] += 1;
             if (x[0] > frame.getWidth() - 1) { x[0] = 0; }
             y[0] += 1;
