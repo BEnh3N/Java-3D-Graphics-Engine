@@ -6,17 +6,29 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main extends JPanel{
 
-    static final int[] x = {0, 100, 0};
-    static final int[] y = {0, 0, 100};
+    private final int[][][] tris = {{{0,0},{100,100},{0,100}},{{500,500},{400,500},{500,400}},{{22,130},{55,255},{499,1}}};
 
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
-        // g2d.fillPolygon(x, y, 3);
-        g2d.drawPolygon(x, y, 3);
+
+        ArrayList<Integer> xPoints = new ArrayList<>();
+        ArrayList<Integer> yPoints = new ArrayList<>();
+
+        for (int[][] tri : tris){
+            for (int[] pnt : tri){
+                xPoints.add(pnt[0]);
+                yPoints.add(pnt[1]);
+            }
+            g2d.drawPolygon(xPoints.stream().mapToInt(i -> i).toArray(), yPoints.stream().mapToInt(i -> i).toArray(), tri.length);
+            xPoints.clear();
+            yPoints.clear();
+        }
     }
 
     public static void main(String[] args) {
@@ -36,16 +48,5 @@ public class Main extends JPanel{
         frame.add(panel);
         frame.setVisible(true);
 
-        for (int i = 0; i < 999; i++) {
-            x[0] += 1;
-            if (x[0] > frame.getWidth() - 1) { x[0] = 0; }
-            y[0] += 1;
-            if (y[0] > frame.getHeight() - 1) { y[0] = 0; }
-
-            System.out.print(x[0]);
-            System.out.print(", ");
-            System.out.println(y[0]);
-            frame.repaint();
-        }
     }
 }
