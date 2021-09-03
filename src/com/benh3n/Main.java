@@ -10,7 +10,19 @@ import java.util.ArrayList;
 
 public class Main extends JPanel{
 
-    private final int[][][] tris = {{{0,0},{100,100},{0,100}},{{500,500},{400,500},{500,400}},{{22,130},{55,255},{499,1}}};
+    public class vec3D {
+        float x;
+        float y;
+        float z;
+    }
+
+    public class triangle {
+        vec3D[] p = new vec3D[3];
+    }
+
+    public static class mesh {
+        ArrayList<triangle> tris = new ArrayList<>();
+    }
 
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -19,15 +31,15 @@ public class Main extends JPanel{
         ArrayList<Integer> xPoints = new ArrayList<>();
         ArrayList<Integer> yPoints = new ArrayList<>();
 
-        for (int[][] tri : tris){
-            for (int[] pnt : tri){
-                xPoints.add(pnt[0]);
-                yPoints.add(pnt[1]);
-            }
-            g2d.drawPolygon(xPoints.stream().mapToInt(i -> i).toArray(), yPoints.stream().mapToInt(i -> i).toArray(), tri.length);
-            xPoints.clear();
-            yPoints.clear();
-        }
+//        for (int[][] tri : tris){
+//            for (int[] pnt : tri){
+//                xPoints.add(pnt[0]);
+//                yPoints.add(pnt[1]);
+//            }
+//            g2d.drawPolygon(xPoints.stream().mapToInt(i -> i).toArray(), yPoints.stream().mapToInt(i -> i).toArray(), tri.length);
+//            xPoints.clear();
+//            yPoints.clear();
+//        }
     }
 
     public static void main(String[] args) {
@@ -40,6 +52,10 @@ public class Main extends JPanel{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(Color.BLACK);
         frame.setSize(500, 500);
+
+        mesh meshCube = new mesh();
+        meshCube.tris.add(new triangle());
+        System.out.println(meshCube.tris);
 
         Main panel = new Main();
         frame.add(panel);
