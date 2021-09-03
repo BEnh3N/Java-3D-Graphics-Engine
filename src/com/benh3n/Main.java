@@ -33,9 +33,7 @@ public class Main extends JPanel{
     public static void main(String[] args) {
 
         BufferedImage img = null;
-        try {
-            img = ImageIO.read(new File("icon.png"));
-        } catch (IOException e) { System.out.println("Image Load Failed!!"); }
+        try { img = ImageIO.read(new File("icon.png")); } catch (IOException e) { System.out.println("you shouldn't be seeing this... (image load failed)"); }
 
         JFrame frame = new JFrame("3D Graphics Engine");
         frame.setIconImage(img);
