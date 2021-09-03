@@ -7,21 +7,51 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main extends JPanel{
 
-    public class vec3D {
+    public static class vec3D {
         float x;
         float y;
         float z;
+        public vec3D(){
+            this.x = 0.0f;
+            this.y = 0.0f;
+            this.x = 0.0f;
+        }
+        public vec3D(float x, float y, float z){
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
     }
 
-    public class triangle {
-        vec3D[] p = new vec3D[3];
+    public static class triangle {
+        vec3D p1;
+        vec3D p2;
+        vec3D p3;
+        public triangle(){
+            this.p1 = new vec3D();
+            this.p2 = new vec3D();
+            this.p3 = new vec3D();
+        }
+        public triangle(vec3D p1, vec3D p2, vec3D p3){
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+    }
+
     }
 
     public static class mesh {
-        ArrayList<triangle> tris = new ArrayList<>();
+        ArrayList<triangle> tris;
+        public mesh(){
+            this.tris = new ArrayList<>();
+        }
+        public mesh(ArrayList<triangle> tris){
+            this.tris = tris;
+        }
     }
 
     public void paint(Graphics g) {
@@ -53,9 +83,17 @@ public class Main extends JPanel{
         frame.setBackground(Color.BLACK);
         frame.setSize(500, 500);
 
-        mesh meshCube = new mesh();
-        meshCube.tris.add(new triangle());
-        System.out.println(meshCube.tris);
+        mesh cubeMesh = new mesh();
+        cubeMesh.tris = new ArrayList<>(Arrays.asList(
+                // SOUTH
+                new triangle(),
+                new triangle(),
+                // EAST
+                new triangle(new vec3D(10.0f, 0.0f, 0.0f), new vec3D(0.0f, 5.0f, 0.0f), new vec3D(7.0f, 0.0f, 0.0f))));
+
+        for (triangle tri : cubeMesh.tris){
+            System.out.println(tri.p1.x);
+        }
 
         Main panel = new Main();
         frame.add(panel);
