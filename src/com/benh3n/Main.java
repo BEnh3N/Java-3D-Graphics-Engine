@@ -54,6 +54,10 @@ public class Main extends JPanel{
         }
     }
 
+    public static class mat4x4 {
+        float[][] m = new float[4][4];
+    }
+
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
@@ -84,20 +88,53 @@ public class Main extends JPanel{
         frame.setSize(500, 500);
 
         mesh cubeMesh = new mesh();
+        mat4x4 matProj = new mat4x4();
+
+
         cubeMesh.tris = new ArrayList<>(Arrays.asList(
                 // SOUTH
-                new triangle(),
-                new triangle(),
+                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
                 // EAST
-                new triangle(new vec3D(10.0f, 0.0f, 0.0f), new vec3D(0.0f, 5.0f, 0.0f), new vec3D(7.0f, 0.0f, 0.0f))));
+                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
+                // NORTH
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
+                // WEST
+                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
+                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+                // TOP
+                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+                // BOTTOM
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
 
-        for (triangle tri : cubeMesh.tris){
-            System.out.println(tri.p1.x);
-        }
+        // Projection Matrix
+        float fNear = 0.1f;
+        float fFar = 1000.0f;
+        float fFov = 90.0f;
+        float fAspectRatio = (float)frame.getHeight() / (float)frame.getWidth();
+        float fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * 3.14159f);
+
+        matProj.m[0][0] = fAspectRatio * fFovRad;
+        matProj.m[1][1] = fFovRad;
+        matProj.m[2][2] = fFar / (fFar - fNear);
+        matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+        matProj.m[2][3] = 1.0f;
+        matProj.m[3][3] = 0.0f;
+
 
         Main panel = new Main();
         frame.add(panel);
         frame.setVisible(true);
+
+        while (true) {
+            for (triangle tri : cubeMesh.tris) {
+                System.out.println(tri.p2.y);
+            }
+        }
 
     }
 }
