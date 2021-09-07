@@ -144,14 +144,21 @@ public class Main extends JPanel{
         frame.add(panel);
         frame.setVisible(true);
 
-        while (true) {
+        // while (true) {
             panel.trisToDraw.clear();
 
             for (triangle tri : cubeMesh.tris) {
                 triangle triProjected = new triangle();
-                triProjected.p1 = panel.MultiplyMatrixVector(tri.p1, matProj);
-                triProjected.p2 = panel.MultiplyMatrixVector(tri.p2, matProj);
-                triProjected.p3 = panel.MultiplyMatrixVector(tri.p3, matProj);
+                triangle triTranslated;
+
+                triTranslated = tri;
+                triTranslated.p1.z = tri.p1.z + 3.0f;
+                triTranslated.p2.z = tri.p2.z + 3.0f;
+                triTranslated.p3.z = tri.p3.z + 3.0f;
+
+                triProjected.p1 = panel.MultiplyMatrixVector(triTranslated.p1, matProj);
+                triProjected.p2 = panel.MultiplyMatrixVector(triTranslated.p2, matProj);
+                triProjected.p3 = panel.MultiplyMatrixVector(triTranslated.p3, matProj);
 
                 // Scale into view
                 triProjected.p1.x += 1.0f; triProjected.p1.y += 1.0f;
@@ -168,7 +175,7 @@ public class Main extends JPanel{
                 panel.trisToDraw.add(triProjected);
             }
             frame.update(frame.getGraphics());
-        }
+        // }
 
     }
 }
