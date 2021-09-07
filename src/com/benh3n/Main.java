@@ -16,9 +16,7 @@ public class Main extends JPanel{
         float y;
         float z;
         public vec3D(){
-            this.x = 0.0f;
-            this.y = 0.0f;
-            this.x = 0.0f;
+
         }
         public vec3D(float x, float y, float z){
             this.x = x;
@@ -32,9 +30,9 @@ public class Main extends JPanel{
         vec3D p2;
         vec3D p3;
         public triangle(){
-            this.p1 = new vec3D();
-            this.p2 = new vec3D();
-            this.p3 = new vec3D();
+            this.p1 = new vec3D(0.0f, 0.0f, 0.0f);
+            this.p2 = new vec3D(0.0f, 0.0f, 0.0f);
+            this.p3 = new vec3D(0.0f, 0.0f, 0.0f);
         }
         public triangle(vec3D p1, vec3D p2, vec3D p3){
             this.p1 = p1;
@@ -58,22 +56,36 @@ public class Main extends JPanel{
         float[][] m = new float[4][4];
     }
 
+    public vec3D MultiplyMatrixVector(vec3D i, mat4x4 m){
+        vec3D o = new vec3D();
+        o.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + m.m[3][0];
+        o.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + m.m[3][1];
+        o.z = i.x * m.m[0][2] + i.y * m.m[1][2] + i.z * m.m[2][2] + m.m[3][2];
+        float w = i.x * m.m[0][3] + i.y * m.m[1][3] + i.z * m.m[2][3] + m.m[3][3];
+
+        if (w != 0.0f){
+            o.x /= w; o.y /= w; o.z /= w;
+        }
+
+        return o;
+    }
+
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
 
-        ArrayList<Integer> xPoints = new ArrayList<>();
+        /* ArrayList<Integer> xPoints = new ArrayList<>();
         ArrayList<Integer> yPoints = new ArrayList<>();
 
-//        for (int[][] tri : tris){
-//            for (int[] pnt : tri){
-//                xPoints.add(pnt[0]);
-//                yPoints.add(pnt[1]);
-//            }
-//            g2d.drawPolygon(xPoints.stream().mapToInt(i -> i).toArray(), yPoints.stream().mapToInt(i -> i).toArray(), tri.length);
-//            xPoints.clear();
-//            yPoints.clear();
-//        }
+        for (int[][] tri : tris){
+            for (int[] pnt : tri){
+                xPoints.add(pnt[0]);
+                yPoints.add(pnt[1]);
+            }
+            g2d.drawPolygon(xPoints.stream().mapToInt(i -> i).toArray(), yPoints.stream().mapToInt(i -> i).toArray(), tri.length);
+            xPoints.clear();
+            yPoints.clear();
+        } */
     }
 
     public static void main(String[] args) {
@@ -116,7 +128,7 @@ public class Main extends JPanel{
         float fFar = 1000.0f;
         float fFov = 90.0f;
         float fAspectRatio = (float)frame.getHeight() / (float)frame.getWidth();
-        float fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * 3.14159f);
+        float fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
 
         matProj.m[0][0] = fAspectRatio * fFovRad;
         matProj.m[1][1] = fFovRad;
@@ -132,7 +144,10 @@ public class Main extends JPanel{
 
         while (true) {
             for (triangle tri : cubeMesh.tris) {
-                System.out.println(tri.p2.y);
+                triangle triProjected = new triangle();
+                triProjected.p1 = panel.MultiplyMatrixVector(tri.p1, matProj);
+                triProjected.p2 = panel.MultiplyMatrixVector(tri.p2, matProj);
+                triProjected.p3 = panel.MultiplyMatrixVector(tri.p3, matProj);
             }
         }
 
