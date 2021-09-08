@@ -3,15 +3,18 @@ package com.benh3n;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Main extends JPanel{
+public class Main {
 
-    public static class vec3D {
+    public static class vec3D implements Cloneable {
         double x;
         double y;
         double z;
@@ -23,9 +26,21 @@ public class Main extends JPanel{
             this.y = y;
             this.z = z;
         }
+
+        public vec3D clone() {
+            try {
+                vec3D clone = (vec3D) super.clone();
+                clone.x = this.x;
+                clone.y = this.y;
+                clone.z = this.z;
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError();
+            }
+        }
     }
 
-    public static class triangle {
+    public static class triangle implements Cloneable {
         vec3D p1;
         vec3D p2;
         vec3D p3;
@@ -40,6 +55,17 @@ public class Main extends JPanel{
             this.p3 = p3;
     }
 
+        public triangle clone() {
+            try {
+                triangle clone = (triangle) super.clone();
+                clone.p1 = this.p1.clone();
+                clone.p2 = this.p2.clone();
+                clone.p3 = this.p3.clone();
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError();
+            }
+        }
     }
 
     public static class mesh {
@@ -53,7 +79,7 @@ public class Main extends JPanel{
         float[][] m = new float[4][4];
     }
 
-    public vec3D MultiplyMatrixVector(vec3D i, mat4x4 m){
+    public static vec3D MultiplyMatrixVector(vec3D i, mat4x4 m){
         vec3D o = new vec3D();
         o.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + m.m[3][0];
         o.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + m.m[3][1];
@@ -67,28 +93,7 @@ public class Main extends JPanel{
         return o;
     }
 
-    ArrayList<triangle> trisToDraw = new ArrayList<>();
-
-    public void paint(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE);
-
-        ArrayList<Double> xPoints = new ArrayList<>();
-        ArrayList<Double> yPoints = new ArrayList<>();
-
-        for (triangle tri : trisToDraw){
-            xPoints.add(tri.p1.x);
-            yPoints.add(tri.p1.y);
-            xPoints.add(tri.p2.x);
-            yPoints.add(tri.p2.y);
-            xPoints.add(tri.p3.x);
-            yPoints.add(tri.p3.y);
-            g2d.drawPolygon(xPoints.stream().mapToDouble(i -> i).mapToInt(i -> (int) i).toArray(),
-                            yPoints.stream().mapToDouble(i -> i).mapToInt(i -> (int) i).toArray(), 3);
-            xPoints.clear();
-            yPoints.clear();
-        }
-    }
+    static boolean running;
 
     public static void main(String[] args) {
 
@@ -97,9 +102,37 @@ public class Main extends JPanel{
 
         JFrame frame = new JFrame("3D Graphics Engine");
         frame.setIconImage(img);
+        frame.setIgnoreRepaint(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setBackground(Color.BLACK);
-        frame.setSize(512, 480);
+
+        frame.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+                    running = false;
+                }
+            }
+        });
+
+        Canvas canvas = new Canvas();
+        canvas.setIgnoreRepaint(true);
+        canvas.setSize(512, 480);
+
+        frame.add(canvas);
+        frame.pack();
+        frame.setVisible(true);
+
+        canvas.createBufferStrategy(2);
+        BufferStrategy buffer = canvas.getBufferStrategy();
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gd.getDefaultConfiguration();
+
+        BufferedImage bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
+
+        Graphics graphics = null;
+        Graphics2D g2d = null;
+        Color background = Color.BLACK;
 
         mesh cubeMesh = new mesh();
         mat4x4 matProj = new mat4x4();
@@ -129,7 +162,7 @@ public class Main extends JPanel{
         float fNear = 0.1f;
         float fFar = 1000.0f;
         float fFov = 90.0f;
-        float fAspectRatio = (float)frame.getHeight() / (float)frame.getWidth();
+        float fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
         float fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
 
         matProj.m[0][0] = fAspectRatio * fFovRad;
@@ -139,43 +172,60 @@ public class Main extends JPanel{
         matProj.m[2][3] = 1.0f;
         matProj.m[3][3] = 0.0f;
 
+        running = true;
+        while (running) {
 
-        Main panel = new Main();
-        frame.add(panel);
-        frame.setVisible(true);
+            try {
+                g2d = bi.createGraphics();
+                g2d.setBackground(background);
 
-        // while (true) {
-            panel.trisToDraw.clear();
+                for (triangle tri : cubeMesh.tris) {
+                    triangle triProjected = new triangle();
+                    triangle triTranslated;
 
-            for (triangle tri : cubeMesh.tris) {
-                triangle triProjected = new triangle();
-                triangle triTranslated;
+                    triTranslated = tri.clone();
+                    triTranslated.p1.z = tri.p1.z + 3.0f;
+                    triTranslated.p2.z = tri.p2.z + 3.0f;
+                    triTranslated.p3.z = tri.p3.z + 3.0f;
 
-                triTranslated = tri;
-                triTranslated.p1.z = tri.p1.z + 3.0f;
-                triTranslated.p2.z = tri.p2.z + 3.0f;
-                triTranslated.p3.z = tri.p3.z + 3.0f;
+                    triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
+                    triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
+                    triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
 
-                triProjected.p1 = panel.MultiplyMatrixVector(triTranslated.p1, matProj);
-                triProjected.p2 = panel.MultiplyMatrixVector(triTranslated.p2, matProj);
-                triProjected.p3 = panel.MultiplyMatrixVector(triTranslated.p3, matProj);
+                    // Scale into view
+                    triProjected.p1.x += 1.0f; triProjected.p1.y += 1.0f;
+                    triProjected.p2.x += 1.0f; triProjected.p2.y += 1.0f;
+                    triProjected.p3.x += 1.0f; triProjected.p3.y += 1.0f;
 
-                // Scale into view
-                triProjected.p1.x += 1.0f; triProjected.p1.y += 1.0f;
-                triProjected.p2.x += 1.0f; triProjected.p2.y += 1.0f;
-                triProjected.p3.x += 1.0f; triProjected.p3.y += 1.0f;
+                    triProjected.p1.x *= 0.5f * (float)canvas.getWidth();
+                    triProjected.p1.y *= 0.5f * (float)canvas.getHeight();
+                    triProjected.p2.x *= 0.5f * (float)canvas.getWidth();
+                    triProjected.p2.y *= 0.5f * (float)canvas.getHeight();
+                    triProjected.p3.x *= 0.5f * (float)canvas.getWidth();
+                    triProjected.p3.y *= 0.5f * (float)canvas.getHeight();
 
-                triProjected.p1.x *= 0.5f * (float)panel.getWidth();
-                triProjected.p1.y *= 0.5f * (float)panel.getHeight();
-                triProjected.p2.x *= 0.5f * (float)panel.getWidth();
-                triProjected.p2.y *= 0.5f * (float)panel.getHeight();
-                triProjected.p3.x *= 0.5f * (float)panel.getWidth();
-                triProjected.p3.y *= 0.5f * (float)panel.getHeight();
+                    g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
+                                    new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
 
-                panel.trisToDraw.add(triProjected);
+                }
+                graphics = buffer.getDrawGraphics();
+                graphics.drawImage(bi, 0, 0, null);
+                if (!buffer.contentsLost()) {
+                    buffer.show();
+                }
+
+                Thread.yield();
+            } finally {
+                if (graphics != null){
+                    graphics.dispose();
+                }
+                if (g2d != null){
+                    g2d.dispose();
+                }
             }
-            frame.update(frame.getGraphics());
-        // }
+        }
+
+        System.exit(0);
 
     }
 }
