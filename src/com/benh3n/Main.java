@@ -81,6 +81,10 @@ public class Main {
         float[][] m = new float[4][4];
     }
 
+    static mesh cubeMesh = new mesh();
+    static mat4x4 matProj = new mat4x4();
+    static float fTheta;
+
     public static vec3D MultiplyMatrixVector(vec3D i, mat4x4 m){
         vec3D o = new vec3D();
         o.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + m.m[3][0];
@@ -96,10 +100,6 @@ public class Main {
     }
 
     static boolean running;
-
-    static mesh cubeMesh = new mesh();
-    static mat4x4 matProj = new mat4x4();
-    static float fTheta;
 
     public static void main(String[] args) {
 
@@ -205,37 +205,38 @@ public class Main {
                 matRotX.m[2][2] = (float) Math.cos(fTheta * 0.5f);
                 matRotX.m[3][3] = 1;
 
+                // Draw Triangles
                 for (triangle tri : cubeMesh.tris) {
                     triangle triProjected = new triangle();
                     triangle triTranslated;
                     triangle triRotatedZ = new triangle();
                     triangle triRotatedZX = new triangle();
 
+                    // Rotate in Z-Axis
                     triRotatedZ.p1 = MultiplyMatrixVector(tri.p1, matRotZ);
                     triRotatedZ.p2 = MultiplyMatrixVector(tri.p2, matRotZ);
                     triRotatedZ.p3 = MultiplyMatrixVector(tri.p3, matRotZ);
 
+                    // Rotate in X-Axis
                     triRotatedZX.p1 = MultiplyMatrixVector(triRotatedZ.p1, matRotX);
                     triRotatedZX.p2 = MultiplyMatrixVector(triRotatedZ.p2, matRotX);
                     triRotatedZX.p3 = MultiplyMatrixVector(triRotatedZ.p3, matRotX);
 
+                    // Offset into the Screen
                     triTranslated = triRotatedZX.clone();
                     triTranslated.p1.z = triRotatedZX.p1.z + 3.0f;
                     triTranslated.p2.z = triRotatedZX.p2.z + 3.0f;
                     triTranslated.p3.z = triRotatedZX.p3.z + 3.0f;
 
+                    // Project Triangles from 3D --> 2D
                     triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
                     triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
                     triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
 
                     // Scale into view
-                    triProjected.p1.x += 1.0f;
-                    triProjected.p1.y += 1.0f;
-                    triProjected.p2.x += 1.0f;
-                    triProjected.p2.y += 1.0f;
-                    triProjected.p3.x += 1.0f;
-                    triProjected.p3.y += 1.0f;
-
+                    triProjected.p1.x += 1.0f; triProjected.p1.y += 1.0f;
+                    triProjected.p2.x += 1.0f; triProjected.p2.y += 1.0f;
+                    triProjected.p3.x += 1.0f; triProjected.p3.y += 1.0f;
                     triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
                     triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
                     triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
@@ -243,6 +244,7 @@ public class Main {
                     triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
                     triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
+                    // Rasterize Triangles
                     g2d.setColor(Color.WHITE);
                     g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
                             new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
