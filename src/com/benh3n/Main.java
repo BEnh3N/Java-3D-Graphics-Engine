@@ -9,6 +9,8 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -95,6 +97,10 @@ public class Main {
 
     static boolean running;
 
+    static mesh cubeMesh = new mesh();
+    static mat4x4 matProj = new mat4x4();
+    static float fTheta;
+
     public static void main(String[] args) {
 
         BufferedImage img = null;
@@ -134,10 +140,6 @@ public class Main {
         Graphics2D g2d = null;
         Color background = Color.BLACK;
 
-        mesh cubeMesh = new mesh();
-        mat4x4 matProj = new mat4x4();
-
-
         cubeMesh.tris = new ArrayList<>(Arrays.asList(
                 // SOUTH
                 new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
@@ -175,38 +177,75 @@ public class Main {
         running = true;
         while (running) {
 
+            Instant now = Instant.now();
+
             try {
+                // Clear Screen
                 g2d = bi.createGraphics();
                 g2d.setBackground(background);
+                g2d.setColor(background);
+                g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                // Set up Rotation Matrices
+                mat4x4 matRotZ = new mat4x4(), matRotX = new mat4x4();
+
+                // Rotation Z
+                matRotZ.m[0][0] = (float) Math.cos(fTheta);
+                matRotZ.m[0][1] = (float) Math.sin(fTheta);
+                matRotZ.m[1][0] = (float) -Math.sin(fTheta);
+                matRotZ.m[1][1] = (float) Math.cos(fTheta);
+                matRotZ.m[2][2] = 1;
+                matRotZ.m[3][3] = 1;
+
+                // Rotation X
+                matRotX.m[0][0] = 1;
+                matRotX.m[1][1] = (float) Math.cos(fTheta * 0.5f);
+                matRotX.m[1][2] = (float) Math.sin(fTheta * 0.5f);
+                matRotX.m[2][1] = (float) -Math.sin(fTheta * 0.5f);
+                matRotX.m[2][2] = (float) Math.cos(fTheta * 0.5f);
+                matRotX.m[3][3] = 1;
 
                 for (triangle tri : cubeMesh.tris) {
                     triangle triProjected = new triangle();
                     triangle triTranslated;
+                    triangle triRotatedZ = new triangle();
+                    triangle triRotatedZX = new triangle();
 
-                    triTranslated = tri.clone();
-                    triTranslated.p1.z = tri.p1.z + 3.0f;
-                    triTranslated.p2.z = tri.p2.z + 3.0f;
-                    triTranslated.p3.z = tri.p3.z + 3.0f;
+                    triRotatedZ.p1 = MultiplyMatrixVector(tri.p1, matRotZ);
+                    triRotatedZ.p2 = MultiplyMatrixVector(tri.p2, matRotZ);
+                    triRotatedZ.p3 = MultiplyMatrixVector(tri.p3, matRotZ);
+
+                    triRotatedZX.p1 = MultiplyMatrixVector(triRotatedZ.p1, matRotX);
+                    triRotatedZX.p2 = MultiplyMatrixVector(triRotatedZ.p2, matRotX);
+                    triRotatedZX.p3 = MultiplyMatrixVector(triRotatedZ.p3, matRotX);
+
+                    triTranslated = triRotatedZX.clone();
+                    triTranslated.p1.z = triRotatedZX.p1.z + 3.0f;
+                    triTranslated.p2.z = triRotatedZX.p2.z + 3.0f;
+                    triTranslated.p3.z = triRotatedZX.p3.z + 3.0f;
 
                     triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
                     triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
                     triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
 
                     // Scale into view
-                    triProjected.p1.x += 1.0f; triProjected.p1.y += 1.0f;
-                    triProjected.p2.x += 1.0f; triProjected.p2.y += 1.0f;
-                    triProjected.p3.x += 1.0f; triProjected.p3.y += 1.0f;
+                    triProjected.p1.x += 1.0f;
+                    triProjected.p1.y += 1.0f;
+                    triProjected.p2.x += 1.0f;
+                    triProjected.p2.y += 1.0f;
+                    triProjected.p3.x += 1.0f;
+                    triProjected.p3.y += 1.0f;
 
-                    triProjected.p1.x *= 0.5f * (float)canvas.getWidth();
-                    triProjected.p1.y *= 0.5f * (float)canvas.getHeight();
-                    triProjected.p2.x *= 0.5f * (float)canvas.getWidth();
-                    triProjected.p2.y *= 0.5f * (float)canvas.getHeight();
-                    triProjected.p3.x *= 0.5f * (float)canvas.getWidth();
-                    triProjected.p3.y *= 0.5f * (float)canvas.getHeight();
+                    triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
+                    triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
+                    triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
+                    triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
+                    triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
+                    triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
+                    g2d.setColor(Color.WHITE);
                     g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
-                                    new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
-
+                            new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
                 }
                 graphics = buffer.getDrawGraphics();
                 graphics.drawImage(bi, 0, 0, null);
@@ -216,16 +255,20 @@ public class Main {
 
                 Thread.yield();
             } finally {
-                if (graphics != null){
+                if (graphics != null) {
                     graphics.dispose();
                 }
-                if (g2d != null){
+                if (g2d != null) {
                     g2d.dispose();
                 }
             }
+
+            Instant end = Instant.now();
+            Duration elapsedTime = Duration.between(now, end);
+            fTheta += elapsedTime.toMillis() * 0.001;
+
         }
 
         System.exit(0);
-
     }
 }
