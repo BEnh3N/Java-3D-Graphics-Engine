@@ -121,7 +121,9 @@ public class Main {
 
         Canvas canvas = new Canvas();
         canvas.setIgnoreRepaint(true);
-        canvas.setSize(512, 480);
+        canvas.setSize(256, 240);
+        // canvas.setSize(512, 480);
+        // canvas.setSize(1000, 1000);
 
         frame.add(canvas);
         frame.pack();
