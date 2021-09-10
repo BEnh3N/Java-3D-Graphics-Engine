@@ -121,8 +121,8 @@ public class Main {
 
         Canvas canvas = new Canvas();
         canvas.setIgnoreRepaint(true);
-        canvas.setSize(256, 240);
-        // canvas.setSize(512, 480);
+        // canvas.setSize(256, 240);
+        canvas.setSize(512, 480);
         // canvas.setSize(1000, 1000);
 
         frame.add(canvas);
@@ -249,7 +249,7 @@ public class Main {
                     // Rasterize Triangles
                     g2d.setColor(Color.WHITE);
                     g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
-                            new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
+                                    new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
                 }
                 graphics = buffer.getDrawGraphics();
                 graphics.drawImage(bi, 0, 0, null);
