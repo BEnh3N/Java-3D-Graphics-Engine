@@ -9,8 +9,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -181,9 +179,9 @@ public class Main {
         running = true;
         while (running) {
 
-            Instant now = Instant.now();
-
             try {
+                long now = System.nanoTime();
+
                 // Recalculate Projection Matrix
                 fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
                 fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
@@ -268,6 +266,12 @@ public class Main {
                     buffer.show();
                 }
 
+                bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
+                long end = System.nanoTime();
+                long elapsedTime = end - now;
+
+                fTheta += elapsedTime / 1000000000.0;
+
                 Thread.yield();
 
             } finally {
@@ -278,14 +282,7 @@ public class Main {
                     g2d.dispose();
                 }
             }
-
-            bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
-            Instant end = Instant.now();
-            Duration elapsedTime = Duration.between(now, end);
-            fTheta += elapsedTime.toMillis() * 0.001;
-
         }
-
         System.exit(0);
     }
 }
