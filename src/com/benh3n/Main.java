@@ -183,15 +183,16 @@ public class Main {
 
             Instant now = Instant.now();
 
-            fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
-            fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
-
-            matProj.m[0][0] = fAspectRatio * fFovRad;
-            matProj.m[1][1] = fFovRad;
-            matProj.m[2][2] = fFar / (fFar - fNear);
-            matProj.m[3][2] = viewSpace;
-
             try {
+                // Recalculate Projection Matrix
+                fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
+                fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
+
+                matProj.m[0][0] = fAspectRatio * fFovRad;
+                matProj.m[1][1] = fFovRad;
+                matProj.m[2][2] = fFar / (fFar - fNear);
+                matProj.m[3][2] = viewSpace;
+
                 // Clear Screen
                 g2d = bi.createGraphics();
                 g2d.setBackground(background);
@@ -268,6 +269,7 @@ public class Main {
                 }
 
                 Thread.yield();
+
             } finally {
                 if (graphics != null) {
                     graphics.dispose();
