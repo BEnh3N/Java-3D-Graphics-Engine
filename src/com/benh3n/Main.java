@@ -124,6 +124,7 @@ public class Main {
         // canvas.setSize(256, 240);
         canvas.setSize(512, 480);
         // canvas.setSize(1000, 1000);
+        canvas.setBackground(Color.BLACK);
 
         frame.add(canvas);
         frame.pack();
@@ -172,7 +173,8 @@ public class Main {
         matProj.m[0][0] = fAspectRatio * fFovRad;
         matProj.m[1][1] = fFovRad;
         matProj.m[2][2] = fFar / (fFar - fNear);
-        matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+        float viewSpace = (-fFar * fNear) / (fFar - fNear);
+        matProj.m[3][2] = viewSpace;
         matProj.m[2][3] = 1.0f;
         matProj.m[3][3] = 0.0f;
 
@@ -180,6 +182,14 @@ public class Main {
         while (running) {
 
             Instant now = Instant.now();
+
+            fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
+            fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
+
+            matProj.m[0][0] = fAspectRatio * fFovRad;
+            matProj.m[1][1] = fFovRad;
+            matProj.m[2][2] = fFar / (fFar - fNear);
+            matProj.m[3][2] = viewSpace;
 
             try {
                 // Clear Screen
@@ -267,6 +277,7 @@ public class Main {
                 }
             }
 
+            bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
             Instant end = Instant.now();
             Duration elapsedTime = Duration.between(now, end);
             fTheta += elapsedTime.toMillis() * 0.001;
