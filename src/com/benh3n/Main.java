@@ -81,6 +81,9 @@ public class Main {
 
     static mesh cubeMesh = new mesh();
     static mat4x4 matProj = new mat4x4();
+
+    static vec3D vCamera = new vec3D();
+
     static float fTheta;
 
     public static vec3D MultiplyMatrixVector(vec3D i, mat4x4 m){
@@ -239,26 +242,51 @@ public class Main {
                     triTranslated.p2.z = triRotatedZX.p2.z + 3.0f;
                     triTranslated.p3.z = triRotatedZX.p3.z + 3.0f;
 
-                    // Project Triangles from 3D --> 2D
-                    triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
-                    triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
-                    triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
+                    vec3D normal = new vec3D(), line1 = new vec3D(), line2 = new vec3D();
+                    line1.x = triTranslated.p2.x - triTranslated.p1.x;
+                    line1.y = triTranslated.p2.y - triTranslated.p1.y;
+                    line1.z = triTranslated.p2.z - triTranslated.p1.z;
 
-                    // Scale into view
-                    triProjected.p1.x += 1.0f; triProjected.p1.y += 1.0f;
-                    triProjected.p2.x += 1.0f; triProjected.p2.y += 1.0f;
-                    triProjected.p3.x += 1.0f; triProjected.p3.y += 1.0f;
-                    triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
-                    triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
-                    triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
-                    triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
-                    triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
-                    triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
+                    line2.x = triTranslated.p3.x - triTranslated.p1.x;
+                    line2.y = triTranslated.p3.y - triTranslated.p1.y;
+                    line2.z = triTranslated.p3.z - triTranslated.p1.z;
 
-                    // Rasterize Triangles
-                    g2d.setColor(Color.WHITE);
-                    g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
-                                    new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
+                    normal.x = line1.y * line2.z - line1.z * line2.y;
+                    normal.y = line1.z * line2.x - line1.x * line2.z;
+                    normal.z = line1.x * line2.y - line1.y * line2.x;
+
+                    float l = (float)Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+                    normal.x /= l; normal.y /= l; normal.z /= l;
+
+                    // if (normal.z < 0)
+                    if(normal.x * (triTranslated.p1.x - vCamera.x) +
+                       normal.y * (triTranslated.p1.y - vCamera.y) +
+                       normal.z * (triTranslated.p1.z - vCamera.z) < 0.0f) {
+
+                        // Project Triangles from 3D --> 2D
+                        triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
+                        triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
+                        triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
+
+                        // Scale into view
+                        triProjected.p1.x += 1.0f;
+                        triProjected.p1.y += 1.0f;
+                        triProjected.p2.x += 1.0f;
+                        triProjected.p2.y += 1.0f;
+                        triProjected.p3.x += 1.0f;
+                        triProjected.p3.y += 1.0f;
+                        triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
+                        triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
+                        triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
+                        triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
+                        triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
+                        triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
+
+                        // Rasterize Triangles
+                        g2d.setColor(Color.WHITE);
+                        g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
+                                new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
+                    }
                 }
                 graphics = buffer.getDrawGraphics();
                 graphics.drawImage(bi, 0, 0, null);
