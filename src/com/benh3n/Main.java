@@ -100,6 +100,10 @@ public class Main {
         return o;
     }
 
+    public static int getColor(float lum){
+        return (int) ((lum * 256) + 0.5f);
+    }
+
     static boolean running;
 
     public static void main(String[] args) {
@@ -263,6 +267,14 @@ public class Main {
                        normal.y * (triTranslated.p1.y - vCamera.y) +
                        normal.z * (triTranslated.p1.z - vCamera.z) < 0.0f) {
 
+                        // Illumination
+                        vec3D lightDirection = new vec3D(0.0f, 0.0f, -1.0f);
+                        l = (float)Math.sqrt(lightDirection.x * lightDirection.x + lightDirection.y * lightDirection.y + lightDirection.z * lightDirection.z);
+                        lightDirection.x /= l; lightDirection.y /= l; lightDirection.z /= l;
+
+                        // How similar is normal to light direction
+                        float dp = (float) (normal.x * lightDirection.x + normal.y * lightDirection.y + normal.z * lightDirection.z);
+
                         // Project Triangles from 3D --> 2D
                         triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
                         triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
@@ -284,7 +296,7 @@ public class Main {
 
                         // Rasterize Triangles
                         g2d.setColor(Color.WHITE);
-                        g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
+                        g2d.fillPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
                                 new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
                     }
                 }
