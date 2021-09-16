@@ -44,10 +44,12 @@ public class Main {
         vec3D p1;
         vec3D p2;
         vec3D p3;
+        short col;
         public triangle(){
             this.p1 = new vec3D(0.0f, 0.0f, 0.0f);
             this.p2 = new vec3D(0.0f, 0.0f, 0.0f);
             this.p3 = new vec3D(0.0f, 0.0f, 0.0f);
+            this.col = 0;
         }
         public triangle(vec3D p1, vec3D p2, vec3D p3){
             this.p1 = p1;
@@ -100,8 +102,8 @@ public class Main {
         return o;
     }
 
-    public static int getColor(float lum){
-        return (int) ((lum * 256) + 0.5f);
+    public static short getColor(float lum){
+        return (short) ((lum * 255) + 0.5f);
     }
 
     static boolean running;
@@ -275,10 +277,13 @@ public class Main {
                         // How similar is normal to light direction
                         float dp = (float) (normal.x * lightDirection.x + normal.y * lightDirection.y + normal.z * lightDirection.z);
 
+                        triTranslated.col = getColor(dp);
+
                         // Project Triangles from 3D --> 2D
                         triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
                         triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
                         triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
+                        triProjected.col = triTranslated.col;
 
                         // Scale into view
                         triProjected.p1.x += 1.0f;
@@ -295,7 +300,7 @@ public class Main {
                         triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
                         // Rasterize Triangles
-                        g2d.setColor(Color.WHITE);
+                        g2d.setColor(new Color(triProjected.col, triProjected.col, triProjected.col));
                         g2d.fillPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
                                 new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
                     }
