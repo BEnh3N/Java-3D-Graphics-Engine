@@ -11,71 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import com.benh3n.Meshes.*;
 
 public class Main {
-
-    public static class vec3D implements Cloneable {
-        double x;
-        double y;
-        double z;
-        public vec3D(){
-
-        }
-        public vec3D(double x, double y, double z){
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public vec3D clone() {
-            try {
-                vec3D clone = (vec3D) super.clone();
-                clone.x = this.x;
-                clone.y = this.y;
-                clone.z = this.z;
-                return clone;
-            } catch (CloneNotSupportedException e) {
-                throw new AssertionError();
-            }
-        }
-    }
-
-    public static class triangle implements Cloneable {
-        vec3D p1;
-        vec3D p2;
-        vec3D p3;
-        short col;
-        public triangle(){
-            this.p1 = new vec3D(0.0f, 0.0f, 0.0f);
-            this.p2 = new vec3D(0.0f, 0.0f, 0.0f);
-            this.p3 = new vec3D(0.0f, 0.0f, 0.0f);
-            this.col = 0;
-        }
-        public triangle(vec3D p1, vec3D p2, vec3D p3){
-            this.p1 = p1;
-            this.p2 = p2;
-            this.p3 = p3;
-    }
-
-        public triangle clone() {
-            try {
-                triangle clone = (triangle) super.clone();
-                clone.p1 = this.p1.clone();
-                clone.p2 = this.p2.clone();
-                clone.p3 = this.p3.clone();
-                return clone;
-            } catch (CloneNotSupportedException e) {
-                throw new AssertionError();
-            }
-        }
-    }
-
-    public static class mesh {
-        ArrayList<triangle> tris;
-        public mesh(){
-            this.tris = new ArrayList<>();
-        }
-    }
 
     public static class mat4x4 {
         float[][] m = new float[4][4];
@@ -103,12 +41,14 @@ public class Main {
     }
 
     public static short getColor(float lum){
-        return (short) ((lum * 255) + 0.5f);
+        return (short) Math.abs(lum * 255);
     }
 
     static boolean running;
 
     public static void main(String[] args) {
+
+        mesh.loadObjectFromFile("VideoShip.obj");
 
         BufferedImage img = null;
         try { img = ImageIO.read(new File("icon.png")); } catch (IOException e) { System.out.println("you shouldn't be seeing this... (image load failed)"); }
@@ -302,6 +242,10 @@ public class Main {
                         // Rasterize Triangles
                         g2d.setColor(new Color(triProjected.col, triProjected.col, triProjected.col));
                         g2d.fillPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
+                                new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
+
+                        g2d.setColor(Color.BLACK);
+                        g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
                                 new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
                     }
                 }
