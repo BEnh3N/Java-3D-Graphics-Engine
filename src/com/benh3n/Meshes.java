@@ -3,7 +3,6 @@ package com.benh3n;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Meshes {
@@ -69,29 +68,35 @@ public class Meshes {
             this.tris = new ArrayList<>();
         }
 
-        public static void loadObjectFromFile(String sFilename){
+        public static mesh loadObjectFromFile(String sFilename){
+            mesh tempMesh = new mesh();
             try {
                 File file = new File(sFilename);
                 Scanner in = new Scanner(file);
                 ArrayList<vec3D> vecList = new ArrayList<>();
                 ArrayList<triangle> triList = new ArrayList<>();
                 while (in.hasNextLine()) {
-                    String line = in.nextLine();
-                    String[] lineSplit = line.split(" ");
-                    if (line.charAt(0) == 'v'){
-                        vecList.add(new vec3D(Float.parseFloat(lineSplit[1]),
-                                Float.parseFloat(lineSplit[2]),
-                                Float.parseFloat(lineSplit[3])));
-                    } else if (line.charAt(0) == 'f'){
-                        System.out.println(Arrays.toString(lineSplit));
-                        triList.add(new triangle());
+                    String[] line = in.nextLine().split(" ");
+                    if (line[0].equals("v")){
+                        float x = Float.parseFloat(line[1]);
+                        float y = Float.parseFloat(line[2]);
+                        float z = Float.parseFloat(line[3]);
+                        vecList.add(new vec3D(x, y, z));
+                    } else if (line[0].equals("f")){
+                        int p1 = Integer.parseInt(line[1]) - 1;
+                        int p2 = Integer.parseInt(line[2]) - 1;
+                        int p3 = Integer.parseInt(line[3]) - 1;
+                        triangle tri = new triangle(vecList.get(p1), vecList.get(p2), vecList.get(p3));
+                        triList.add(tri);
                     }
                 }
                 in.close();
+                tempMesh.tris = triList;
             } catch (FileNotFoundException e) {
                 System.out.println("File not Found!");
                 e.printStackTrace();
             }
+            return tempMesh;
         }
     }
 }

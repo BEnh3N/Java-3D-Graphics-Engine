@@ -10,7 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
+
 import com.benh3n.Meshes.*;
 
 public class Main {
@@ -47,8 +48,6 @@ public class Main {
     static boolean running;
 
     public static void main(String[] args) {
-
-        mesh.loadObjectFromFile("VideoShip.obj");
 
         BufferedImage img = null;
         try { img = ImageIO.read(new File("icon.png")); } catch (IOException e) { System.out.println("you shouldn't be seeing this... (image load failed)"); }
@@ -90,25 +89,27 @@ public class Main {
         Graphics2D g2d = null;
         Color background = Color.BLACK;
 
-        cubeMesh.tris = new ArrayList<>(Arrays.asList(
-                // SOUTH
-                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
-                // EAST
-                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
-                // NORTH
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
-                // WEST
-                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
-                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-                // TOP
-                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-                // BOTTOM
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
+//        cubeMesh.tris = new ArrayList<>(Arrays.asList(
+//                // SOUTH
+//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
+//                // EAST
+//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
+//                // NORTH
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
+//                // WEST
+//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
+//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+//                // TOP
+//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+//                // BOTTOM
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
+
+        cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
 
         // Projection Matrix
         float fNear = 0.1f;
@@ -165,6 +166,8 @@ public class Main {
                 matRotX.m[2][2] = (float) Math.cos(fTheta * 0.5f);
                 matRotX.m[3][3] = 1;
 
+                ArrayList<triangle> trianglesToRaster = new ArrayList<>();
+
                 // Draw Triangles
                 for (triangle tri : cubeMesh.tris) {
                     triangle triProjected = new triangle();
@@ -184,9 +187,9 @@ public class Main {
 
                     // Offset into the Screen
                     triTranslated = triRotatedZX.clone();
-                    triTranslated.p1.z = triRotatedZX.p1.z + 3.0f;
-                    triTranslated.p2.z = triRotatedZX.p2.z + 3.0f;
-                    triTranslated.p3.z = triRotatedZX.p3.z + 3.0f;
+                    triTranslated.p1.z = triRotatedZX.p1.z + 8.0f;
+                    triTranslated.p2.z = triRotatedZX.p2.z + 8.0f;
+                    triTranslated.p3.z = triRotatedZX.p3.z + 8.0f;
 
                     vec3D normal = new vec3D(), line1 = new vec3D(), line2 = new vec3D();
                     line1.x = triTranslated.p2.x - triTranslated.p1.x;
@@ -239,16 +242,28 @@ public class Main {
                         triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
                         triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
-                        // Rasterize Triangles
-                        g2d.setColor(new Color(triProjected.col, triProjected.col, triProjected.col));
-                        g2d.fillPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
-                                new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
-
-                        g2d.setColor(Color.BLACK);
-                        g2d.drawPolygon(new int[]{(int) triProjected.p1.x, (int) triProjected.p2.x, (int) triProjected.p3.x},
-                                new int[]{(int) triProjected.p1.y, (int) triProjected.p2.y, (int) triProjected.p3.y}, 3);
+                        trianglesToRaster.add(triProjected);
                     }
                 }
+
+                Comparator<triangle> comp = (triangle t1) -> {
+                    double z1 = (t1.p1.z + t1.p2.z + t1.p3.z) / 3.0;
+                    double z2 = (t1.p1.z + t1.p2.z + t1.p3.z) / 3.0;
+                    return (int) z1;
+                };
+                trianglesToRaster.sort(comp);
+
+                for (triangle triToRaster: trianglesToRaster) {
+                    // Rasterize Triangles
+                    g2d.setColor(new Color(triToRaster.col, triToRaster.col, triToRaster.col));
+                    g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
+                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
+                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+                }
+
                 graphics = buffer.getDrawGraphics();
                 graphics.drawImage(bi, 0, 0, null);
                 if (!buffer.contentsLost()) {
