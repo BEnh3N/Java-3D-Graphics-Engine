@@ -246,10 +246,11 @@ public class Main {
                     }
                 }
 
-                Comparator<triangle> comp = (triangle t1) -> {
+                Comparator<triangle> comp = (triangle t1, triangle t2) -> {
                     double z1 = (t1.p1.z + t1.p2.z + t1.p3.z) / 3.0;
-                    double z2 = (t1.p1.z + t1.p2.z + t1.p3.z) / 3.0;
-                    return (int) z1;
+                    double z2 = (t2.p1.z + t2.p2.z + t2.p3.z) / 3.0;
+                    return Double.compare(z2, z1);
+
                 };
                 trianglesToRaster.sort(comp);
 
