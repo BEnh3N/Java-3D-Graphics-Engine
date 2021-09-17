@@ -27,19 +27,106 @@ public class Main {
 
     static float fTheta;
 
-    public static vec3D MultiplyMatrixVector(vec3D i, mat4x4 m){
-        vec3D o = new vec3D();
-        o.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + m.m[3][0];
-        o.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + m.m[3][1];
-        o.z = i.x * m.m[0][2] + i.y * m.m[1][2] + i.z * m.m[2][2] + m.m[3][2];
-        double w = i.x * m.m[0][3] + i.y * m.m[1][3] + i.z * m.m[2][3] + m.m[3][3];
+    public static vec3D MatrixMultiplyVector(mat4x4 m, vec3D i) {
+        vec3D v = new vec3D();
+        v.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + i.w * m.m[3][0];
+        v.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + i.w * m.m[3][1];
+        v.z = i.x * m.m[0][2] + i.y * m.m[1][2] + i.z * m.m[2][2] + i.w * m.m[3][2];
+        v.w = i.x * m.m[0][3] + i.y * m.m[1][3] + i.z * m.m[2][3] + i.w * m.m[3][3];
 
-        if (w != 0.0f){
-            o.x /= w; o.y /= w; o.z /= w;
-        }
-
-        return o;
+        return v;
     }
+    public static mat4x4 MatrixMakeIdentity() {
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = 1.0f;
+        matrix.m[1][1] = 1.0f;
+        matrix.m[2][2] = 1.0f;
+        matrix.m[3][3] = 1.0f;
+        return matrix;
+    }
+    public static mat4x4 MatrixMakeRotationX(float fAngleRad) {
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = 1.0f;
+        matrix.m[1][1] = (float) Math.cos(fAngleRad);
+        matrix.m[1][2] = (float) Math.sin(fAngleRad);
+        matrix.m[2][1] = (float) -Math.sin(fAngleRad);
+        matrix.m[2][2] = (float) Math.cos(fAngleRad);
+        matrix.m[3][3] = 1.0f;
+        return matrix;
+    }
+    public static mat4x4 MatrixMakeRotationY(float fAngleRad) {
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = (float) Math.cos(fAngleRad);
+        matrix.m[0][2] = (float) Math.sin(fAngleRad);
+        matrix.m[2][0] = (float) -Math.sin(fAngleRad);
+        matrix.m[1][1] = 1.0f;
+        matrix.m[2][2] = (float) Math.cos(fAngleRad);
+        matrix.m[3][3] = 1.0f;
+        return matrix;
+    }
+    public static mat4x4 MatrixMakeRotationZ(float fAngleRad) {
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = (float) Math.cos(fAngleRad);
+        matrix.m[0][1] = (float) Math.sin(fAngleRad);
+        matrix.m[1][0] = (float) -Math.sin(fAngleRad);
+        matrix.m[1][1] = (float) Math.cos(fAngleRad);
+        matrix.m[2][2] = 1.0f;
+        matrix.m[3][3] = 1.0f;
+        return matrix;
+    }
+    public static mat4x4 Matrix_MakeTranslation(float x, float y, float z) {
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = 1.0f;
+        matrix.m[1][1] = 1.0f;
+        matrix.m[2][2] = 1.0f;
+        matrix.m[3][3] = 1.0f;
+        matrix.m[3][0] = x;
+        matrix.m[3][1] = y;
+        matrix.m[3][2] = z;
+        return matrix;
+    }
+    public static mat4x4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear, float fFar) {
+        float fFovRad = 1.0f / (float) Math.tan(fFovDegrees * 0.5f / 180.0f * 3.14159f);
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = fAspectRatio * fFovRad;
+        matrix.m[1][1] = fFovRad;
+        matrix.m[2][2] = fFar / (fFar - fNear);
+        matrix.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+        matrix.m[2][3] = 1.0f;
+        matrix.m[3][3] = 0.0f;
+        return matrix;
+    }
+
+    public static vec3D VectorAdd(vec3D v1, vec3D v2) {
+        return new vec3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    }
+    public static vec3D VectorSub(vec3D v1, vec3D v2) {
+        return new vec3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    }
+    public static vec3D VectorMul(vec3D v1, float k) {
+        return new vec3D(v1.x * k, v1.y * k, v1.z * k);
+    }
+    public static vec3D VectorDiv(vec3D v1, float k) {
+        return new vec3D(v1.x / k, v1.y / k, v1.z / k);
+    }
+    public static float VectorDotProduct(vec3D v1, vec3D v2) {
+        return (float) (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
+    }
+    public static float VectorLength(vec3D v) {
+        return (float) Math.sqrt(VectorDotProduct(v, v));
+    }
+    public static vec3D VectorNormalise(vec3D v) {
+        float l = VectorLength(v);
+        return new vec3D(v.x / l, v.y / l, v.z / l);
+    }
+    public static vec3D VectorCrossProduct(vec3D v1, vec3D v2) {
+        vec3D v = new vec3D();
+        v.x = v1.y * v2.z - v1.z * v2.y;
+        v.y = v1.z * v2.x - v1.x * v2.z;
+        v.z = v1.x * v2.y - v1.y * v2.x;
+        return v;
+    }
+
 
     public static short getColor(float lum){
         return (short) Math.abs(lum * 255);
@@ -88,26 +175,6 @@ public class Main {
         Graphics graphics = null;
         Graphics2D g2d = null;
         Color background = Color.BLACK;
-
-//        cubeMesh.tris = new ArrayList<>(Arrays.asList(
-//                // SOUTH
-//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
-//                // EAST
-//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
-//                // NORTH
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
-//                // WEST
-//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
-//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-//                // TOP
-//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-//                // BOTTOM
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
 
         cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
 
@@ -250,7 +317,6 @@ public class Main {
                     double z1 = (t1.p1.z + t1.p2.z + t1.p3.z) / 3.0;
                     double z2 = (t2.p1.z + t2.p2.z + t2.p3.z) / 3.0;
                     return Double.compare(z2, z1);
-
                 };
                 trianglesToRaster.sort(comp);
 
