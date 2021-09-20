@@ -186,26 +186,26 @@ public class Main {
         Color background = Color.BLACK;
 
         // Load Object From File
-        // cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
-        cubeMesh.tris = new ArrayList<>(Arrays.asList(
-                // SOUTH
-                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
-                // EAST
-                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
-                // NORTH
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
-                // WEST
-                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
-                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-                // TOP
-                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-                // BOTTOM
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
+        cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
+//        cubeMesh.tris = new ArrayList<>(Arrays.asList(
+//                // SOUTH
+//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
+//                // EAST
+//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
+//                // NORTH
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
+//                // WEST
+//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
+//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+//                // TOP
+//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+//                // BOTTOM
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
 
 
         // Projection Matrix
@@ -236,7 +236,7 @@ public class Main {
                 matTrans = MatrixMakeTranslation(0.0f, 0.0f, 16.0f);
 
                 mat4x4 matWorld;
-                matWorld = MatrixMakeIdentity();
+                // matWorld = MatrixMakeIdentity();
                 matWorld = MatrixMultiplyMatrix(matRotZ, matRotX);
                 matWorld = MatrixMultiplyMatrix(matWorld, matTrans);
 
@@ -249,7 +249,7 @@ public class Main {
                     triangle triTransformed = new triangle();
 
                     triTransformed.p1 = MatrixMultiplyVector(matWorld, tri.p1);
-                    triTransformed.p2 = MatrixMultiplyVector(matWorld, tri.p3);
+                    triTransformed.p2 = MatrixMultiplyVector(matWorld, tri.p2);
                     triTransformed.p3 = MatrixMultiplyVector(matWorld, tri.p3);
 
                     // Calculate Triangle Normal
@@ -259,25 +259,11 @@ public class Main {
                     line1 = VectorSub(triTransformed.p2, triTransformed.p1);
                     line2 = VectorSub(triTransformed.p3, triTransformed.p1);
 
-                    System.out.println(line1.x);
-                    System.out.println(line1.y);
-                    System.out.println(line1.z);
-                    System.out.println(" ");
-
-
-                    System.out.println(line2.x);
-                    System.out.println(line2.y);
-                    System.out.println(line2.z);
-                    System.out.println(" ");
-
-                    System.out.println(" ");
-
-
                     // Take Cross Product of lines to get normal to triangle surface
                     normal = VectorCrossProduct(line1, line2);
 
                     // You Normally need to Normalise a Normal!
-                    normal = VectorNormalise(normal);
+                    normal = VectorNormalise(normal.clone());
 
                     // Get Ray from Triangle to Camera
                     vec3D vCameraRay = VectorSub(triTransformed.p1, vCamera);
@@ -321,8 +307,6 @@ public class Main {
 
                         // Store Triangles for sorting
                         trianglesToRaster.add(triProjected);
-
-                        System.out.println(triProjected.p1.x + ", " + triProjected.p1.y);
                     }
                 }
 
