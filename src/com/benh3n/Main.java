@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 
 import com.benh3n.Meshes.*;
@@ -74,7 +75,7 @@ public class Main {
         matrix.m[3][3] = 1.0f;
         return matrix;
     }
-    public static mat4x4 Matrix_MakeTranslation(float x, float y, float z) {
+    public static mat4x4 MatrixMakeTranslation(float x, float y, float z) {
         mat4x4 matrix = new mat4x4();
         matrix.m[0][0] = 1.0f;
         matrix.m[1][1] = 1.0f;
@@ -85,7 +86,7 @@ public class Main {
         matrix.m[3][2] = z;
         return matrix;
     }
-    public static mat4x4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear, float fFar) {
+    public static mat4x4 MatrixMakeProjection(float fFovDegrees, float fAspectRatio, float fNear, float fFar) {
         float fFovRad = 1.0f / (float) Math.tan(fFovDegrees * 0.5f / 180.0f * 3.14159f);
         mat4x4 matrix = new mat4x4();
         matrix.m[0][0] = fAspectRatio * fFovRad;
@@ -96,7 +97,15 @@ public class Main {
         matrix.m[3][3] = 0.0f;
         return matrix;
     }
-
+    public static mat4x4 MatrixMultiplyMatrix(mat4x4 m1, mat4x4 m2) {
+        mat4x4 matrix = new mat4x4();
+        for (int c = 0; c < 4; c++) {
+            for (int r = 0; r < 4; r++) {
+                matrix.m[r][c] = m1.m[r][0] * m2.m[0][c] + m1.m[r][1] * m2.m[1][c] + m1.m[r][2] * m2.m[2][c] + m1.m[r][3] * m2.m[3][c];
+            }
+        }
+        return matrix;
+    }
     public static vec3D VectorAdd(vec3D v1, vec3D v2) {
         return new vec3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     }
@@ -176,22 +185,31 @@ public class Main {
         Graphics2D g2d = null;
         Color background = Color.BLACK;
 
-        cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
+        // Load Object From File
+        // cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
+        cubeMesh.tris = new ArrayList<>(Arrays.asList(
+                // SOUTH
+                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
+                // EAST
+                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
+                // NORTH
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
+                // WEST
+                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
+                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+                // TOP
+                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
+                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
+                // BOTTOM
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
+                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
+
 
         // Projection Matrix
-        float fNear = 0.1f;
-        float fFar = 1000.0f;
-        float fFov = 90.0f;
-        float fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
-        float fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
-
-        matProj.m[0][0] = fAspectRatio * fFovRad;
-        matProj.m[1][1] = fFovRad;
-        matProj.m[2][2] = fFar / (fFar - fNear);
-        float viewSpace = (-fFar * fNear) / (fFar - fNear);
-        matProj.m[3][2] = viewSpace;
-        matProj.m[2][3] = 1.0f;
-        matProj.m[3][3] = 0.0f;
+        matProj = MatrixMakeProjection(90.0f, (float)canvas.getHeight() / (float)canvas.getWidth(), 0.1f, 1000.0f);
 
         running = true;
         while (running) {
@@ -200,13 +218,7 @@ public class Main {
                 long now = System.nanoTime();
 
                 // Recalculate Projection Matrix
-                fAspectRatio = (float)canvas.getHeight() / (float)canvas.getWidth();
-                fFovRad = 1.0f / (float)Math.tan(fFov * 0.5f / 180.0f * (float)Math.PI);
-
-                matProj.m[0][0] = fAspectRatio * fFovRad;
-                matProj.m[1][1] = fFovRad;
-                matProj.m[2][2] = fFar / (fFar - fNear);
-                matProj.m[3][2] = viewSpace;
+                matProj = MatrixMakeProjection(90.0f, (float)canvas.getHeight() / (float)canvas.getWidth(), 0.1f, 1000.0f);
 
                 // Clear Screen
                 g2d = bi.createGraphics();
@@ -215,93 +227,91 @@ public class Main {
                 g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
                 // Set up Rotation Matrices
-                mat4x4 matRotZ = new mat4x4(), matRotX = new mat4x4();
+                mat4x4 matRotZ, matRotX;
 
-                // Rotation Z
-                matRotZ.m[0][0] = (float) Math.cos(fTheta);
-                matRotZ.m[0][1] = (float) Math.sin(fTheta);
-                matRotZ.m[1][0] = (float) -Math.sin(fTheta);
-                matRotZ.m[1][1] = (float) Math.cos(fTheta);
-                matRotZ.m[2][2] = 1;
-                matRotZ.m[3][3] = 1;
+                matRotZ = MatrixMakeRotationZ(fTheta * 0.5f);
+                matRotX = MatrixMakeRotationX(fTheta);
 
-                // Rotation X
-                matRotX.m[0][0] = 1;
-                matRotX.m[1][1] = (float) Math.cos(fTheta * 0.5f);
-                matRotX.m[1][2] = (float) Math.sin(fTheta * 0.5f);
-                matRotX.m[2][1] = (float) -Math.sin(fTheta * 0.5f);
-                matRotX.m[2][2] = (float) Math.cos(fTheta * 0.5f);
-                matRotX.m[3][3] = 1;
+                mat4x4 matTrans;
+                matTrans = MatrixMakeTranslation(0.0f, 0.0f, 16.0f);
 
+                mat4x4 matWorld;
+                matWorld = MatrixMakeIdentity();
+                matWorld = MatrixMultiplyMatrix(matRotZ, matRotX);
+                matWorld = MatrixMultiplyMatrix(matWorld, matTrans);
+
+                // Store Triangles for Rastering Later
                 ArrayList<triangle> trianglesToRaster = new ArrayList<>();
 
                 // Draw Triangles
                 for (triangle tri : cubeMesh.tris) {
                     triangle triProjected = new triangle();
-                    triangle triTranslated;
-                    triangle triRotatedZ = new triangle();
-                    triangle triRotatedZX = new triangle();
+                    triangle triTransformed = new triangle();
 
-                    // Rotate in Z-Axis
-                    triRotatedZ.p1 = MultiplyMatrixVector(tri.p1, matRotZ);
-                    triRotatedZ.p2 = MultiplyMatrixVector(tri.p2, matRotZ);
-                    triRotatedZ.p3 = MultiplyMatrixVector(tri.p3, matRotZ);
+                    triTransformed.p1 = MatrixMultiplyVector(matWorld, tri.p1);
+                    triTransformed.p2 = MatrixMultiplyVector(matWorld, tri.p3);
+                    triTransformed.p3 = MatrixMultiplyVector(matWorld, tri.p3);
 
-                    // Rotate in X-Axis
-                    triRotatedZX.p1 = MultiplyMatrixVector(triRotatedZ.p1, matRotX);
-                    triRotatedZX.p2 = MultiplyMatrixVector(triRotatedZ.p2, matRotX);
-                    triRotatedZX.p3 = MultiplyMatrixVector(triRotatedZ.p3, matRotX);
+                    // Calculate Triangle Normal
+                    vec3D normal, line1, line2;
 
-                    // Offset into the Screen
-                    triTranslated = triRotatedZX.clone();
-                    triTranslated.p1.z = triRotatedZX.p1.z + 8.0f;
-                    triTranslated.p2.z = triRotatedZX.p2.z + 8.0f;
-                    triTranslated.p3.z = triRotatedZX.p3.z + 8.0f;
+                    // Get lines either side of triangle
+                    line1 = VectorSub(triTransformed.p2, triTransformed.p1);
+                    line2 = VectorSub(triTransformed.p3, triTransformed.p1);
 
-                    vec3D normal = new vec3D(), line1 = new vec3D(), line2 = new vec3D();
-                    line1.x = triTranslated.p2.x - triTranslated.p1.x;
-                    line1.y = triTranslated.p2.y - triTranslated.p1.y;
-                    line1.z = triTranslated.p2.z - triTranslated.p1.z;
+                    System.out.println(line1.x);
+                    System.out.println(line1.y);
+                    System.out.println(line1.z);
+                    System.out.println(" ");
 
-                    line2.x = triTranslated.p3.x - triTranslated.p1.x;
-                    line2.y = triTranslated.p3.y - triTranslated.p1.y;
-                    line2.z = triTranslated.p3.z - triTranslated.p1.z;
 
-                    normal.x = line1.y * line2.z - line1.z * line2.y;
-                    normal.y = line1.z * line2.x - line1.x * line2.z;
-                    normal.z = line1.x * line2.y - line1.y * line2.x;
+                    System.out.println(line2.x);
+                    System.out.println(line2.y);
+                    System.out.println(line2.z);
+                    System.out.println(" ");
 
-                    float l = (float)Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-                    normal.x /= l; normal.y /= l; normal.z /= l;
+                    System.out.println(" ");
 
-                    // if (normal.z < 0)
-                    if(normal.x * (triTranslated.p1.x - vCamera.x) +
-                       normal.y * (triTranslated.p1.y - vCamera.y) +
-                       normal.z * (triTranslated.p1.z - vCamera.z) < 0.0f) {
+
+                    // Take Cross Product of lines to get normal to triangle surface
+                    normal = VectorCrossProduct(line1, line2);
+
+                    // You Normally need to Normalise a Normal!
+                    normal = VectorNormalise(normal);
+
+                    // Get Ray from Triangle to Camera
+                    vec3D vCameraRay = VectorSub(triTransformed.p1, vCamera);
+
+                    // If ray is aligned with normal, then triangle is visible
+                    if(VectorDotProduct(normal, vCameraRay) < 0.0f) {
 
                         // Illumination
-                        vec3D lightDirection = new vec3D(0.0f, 0.0f, -1.0f);
-                        l = (float)Math.sqrt(lightDirection.x * lightDirection.x + lightDirection.y * lightDirection.y + lightDirection.z * lightDirection.z);
-                        lightDirection.x /= l; lightDirection.y /= l; lightDirection.z /= l;
+                        vec3D lightDirection = new vec3D(0.0f, 1.0f, -1.0f);
+                        lightDirection = VectorNormalise(lightDirection);
 
-                        // How similar is normal to light direction
-                        float dp = (float) (normal.x * lightDirection.x + normal.y * lightDirection.y + normal.z * lightDirection.z);
-
-                        triTranslated.col = getColor(dp);
+                        // How "aligned" are light direction and triangle surface normal?
+                        float dp = Math.max(1.0f, VectorDotProduct(lightDirection, normal));
+                        // Choose Colors as Required
+                        triTransformed.col = getColor(dp);
 
                         // Project Triangles from 3D --> 2D
-                        triProjected.p1 = MultiplyMatrixVector(triTranslated.p1, matProj);
-                        triProjected.p2 = MultiplyMatrixVector(triTranslated.p2, matProj);
-                        triProjected.p3 = MultiplyMatrixVector(triTranslated.p3, matProj);
-                        triProjected.col = triTranslated.col;
+                        triProjected.p1 = MatrixMultiplyVector(matProj, triTransformed.p1);
+                        triProjected.p2 = MatrixMultiplyVector(matProj, triTransformed.p2);
+                        triProjected.p3 = MatrixMultiplyVector(matProj, triTransformed.p3);
+                        triProjected.col = triTransformed.col;
 
-                        // Scale into view
-                        triProjected.p1.x += 1.0f;
-                        triProjected.p1.y += 1.0f;
-                        triProjected.p2.x += 1.0f;
-                        triProjected.p2.y += 1.0f;
-                        triProjected.p3.x += 1.0f;
-                        triProjected.p3.y += 1.0f;
+                        // Scale into view, we moved the normalising into cartesian space
+                        // out of the matrix.vector function from the previous video, so
+                        // do this manually
+                        triProjected.p1 = VectorDiv(triProjected.p1, (float) triProjected.p1.w);
+                        triProjected.p2 = VectorDiv(triProjected.p2, (float) triProjected.p2.w);
+                        triProjected.p3 = VectorDiv(triProjected.p3, (float) triProjected.p3.w);
+
+                        // Offset verts into visible normalised space
+                        vec3D vOffsetView = new vec3D(1.0f, 1.0f, 0.0f);
+                        triProjected.p1 = VectorAdd(triProjected.p1, vOffsetView);
+                        triProjected.p2 = VectorAdd(triProjected.p2, vOffsetView);
+                        triProjected.p3 = VectorAdd(triProjected.p3, vOffsetView);
                         triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
                         triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
                         triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
@@ -309,7 +319,10 @@ public class Main {
                         triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
                         triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
+                        // Store Triangles for sorting
                         trianglesToRaster.add(triProjected);
+
+                        System.out.println(triProjected.p1.x + ", " + triProjected.p1.y);
                     }
                 }
 

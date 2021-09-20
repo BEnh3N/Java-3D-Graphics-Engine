@@ -12,7 +12,10 @@ public class Meshes {
         double z;
         double w;
         public vec3D(){
-
+            this.x = 0.0;
+            this.y = 0.0;
+            this.z = 0.0;
+            this.w = 1.0;
         }
         public vec3D(double x, double y, double z){
             this.x = x;
@@ -39,9 +42,9 @@ public class Meshes {
         vec3D p3;
         short col;
         public triangle(){
-            this.p1 = new vec3D(0.0f, 0.0f, 0.0f);
-            this.p2 = new vec3D(0.0f, 0.0f, 0.0f);
-            this.p3 = new vec3D(0.0f, 0.0f, 0.0f);
+            this.p1 = new vec3D();
+            this.p2 = new vec3D();
+            this.p3 = new vec3D();
             this.col = 0;
         }
         public triangle(vec3D p1, vec3D p2, vec3D p3){
@@ -102,22 +105,3 @@ public class Meshes {
     }
 }
 
-//        cubeMesh.tris = new ArrayList<>(Arrays.asList(
-//                // SOUTH
-//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-//                new triangle(new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f)),
-//                // EAST
-//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-//                new triangle(new vec3D(1.0f, 0.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 0.0f, 1.0f)),
-//                // NORTH
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f)),
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f)),
-//                // WEST
-//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f)),
-//                new triangle(new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-//                // TOP
-//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(0.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 1.0f)),
-//                new triangle(new vec3D(0.0f, 1.0f, 0.0f), new vec3D(1.0f, 1.0f, 1.0f), new vec3D(1.0f, 1.0f, 0.0f)),
-//                // BOTTOM
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f)),
-//                new triangle(new vec3D(1.0f, 0.0f, 1.0f), new vec3D(0.0f, 0.0f, 0.0f), new vec3D(1.0f, 0.0f, 0.0f))));
