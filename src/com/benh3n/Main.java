@@ -17,10 +17,7 @@ import com.benh3n.Meshes.*;
 public class Main {
 
     public static class mat4x4 {
-        float[][] m;
-        public mat4x4() {
-            this.m = new float[4][4];
-        }
+        float[][] m = new float[4][4];
     }
 
     static mesh cubeMesh = new mesh();
@@ -225,8 +222,7 @@ public class Main {
 
                 // Draw Triangles
                 for (triangle tri : cubeMesh.tris) {
-                    triangle triProjected = new triangle();
-                    triangle triTransformed = new triangle();
+                    triangle triProjected = new triangle(), triTransformed = new triangle();
 
                     triTransformed.p1 = MatrixMultiplyVector(matWorld, tri.p1);
                     triTransformed.p2 = MatrixMultiplyVector(matWorld, tri.p2);
@@ -266,20 +262,12 @@ public class Main {
                         triProjected.p3 = MatrixMultiplyVector(matProj, triTransformed.p3);
                         triProjected.col = triTransformed.col;
 
-//                        double tempZ1 = triProjected.p1.z;
-//                        double tempZ2 = triProjected.p2.z;
-//                        double tempZ3 = triProjected.p3.z;
-
                         // Scale into view, we moved the normalising into cartesian space
                         // out of the matrix.vector function from the previous video, so
                         // do this manually
                         triProjected.p1 = VectorDiv(triProjected.p1, (float) triProjected.p1.w, false);
                         triProjected.p2 = VectorDiv(triProjected.p2, (float) triProjected.p2.w, false);
                         triProjected.p3 = VectorDiv(triProjected.p3, (float) triProjected.p3.w, false);
-
-//                        triProjected.p1.z = tempZ1;
-//                        triProjected.p2.z = tempZ2;
-//                        triProjected.p3.z = tempZ3;
 
                         // Offset verts into visible normalised space
                         vec3D vOffsetView = new vec3D(1.0f, 1.0f, 0.0f);
@@ -311,9 +299,9 @@ public class Main {
                     g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
                             new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
 
-//                    g2d.setColor(Color.WHITE);
-//                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
-//                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
+                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
                 }
 
                 graphics = buffer.getDrawGraphics();

@@ -30,12 +30,6 @@ public class Meshes {
                 throw new AssertionError();
             }
         }
-        public void print() {
-            System.out.print(this.x + ", ");
-            System.out.print(this.y + ", ");
-            System.out.print(this.z + ", ");
-            System.out.println(this.w);
-        }
     }
 
     public static class triangle implements Cloneable {
