@@ -7,15 +7,11 @@ import java.util.Scanner;
 
 public class Meshes {
     public static class vec3D implements Cloneable {
-        double x;
-        double y;
-        double z;
-        double w;
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        double w = 1.0;
         public vec3D(){
-            this.x = 0.0;
-            this.y = 0.0;
-            this.z = 0.0;
-            this.w = 1.0;
         }
         public vec3D(double x, double y, double z){
             this.x = x;
@@ -34,6 +30,12 @@ public class Meshes {
                 throw new AssertionError();
             }
         }
+        public void print() {
+            System.out.print(this.x + ", ");
+            System.out.print(this.y + ", ");
+            System.out.print(this.z + ", ");
+            System.out.println(this.w);
+        }
     }
 
     public static class triangle implements Cloneable {
@@ -42,10 +44,6 @@ public class Meshes {
         vec3D p3;
         short col;
         public triangle(){
-            this.p1 = new vec3D();
-            this.p2 = new vec3D();
-            this.p3 = new vec3D();
-            this.col = 0;
         }
         public triangle(vec3D p1, vec3D p2, vec3D p3){
             this.p1 = p1;
@@ -69,7 +67,6 @@ public class Meshes {
     public static class mesh {
         ArrayList<triangle> tris;
         public mesh(){
-            this.tris = new ArrayList<>();
         }
 
         public static mesh loadObjectFromFile(String sFilename){

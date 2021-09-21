@@ -119,9 +119,8 @@ public class Main {
     }
     public static vec3D VectorDiv(vec3D v1, float k, boolean includeZ) {
         double z = v1.z;
-        if (includeZ) {
+        if (includeZ)
             z /= k;
-        }
         return new vec3D(v1.x / k, v1.y / k, z );
     }
     public static float VectorDotProduct(vec3D v1, vec3D v2) {
@@ -160,9 +159,8 @@ public class Main {
 
         frame.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     running = false;
-                }
             }
         });
 
@@ -193,9 +191,6 @@ public class Main {
         // Load Object From File
         cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
 
-        // Projection Matrix
-        matProj = MatrixMakeProjection(90.0f, (float)canvas.getHeight() / (float)canvas.getWidth(), 0.1f, 1000.0f);
-
         running = true;
         while (running) {
 
@@ -214,11 +209,11 @@ public class Main {
                 // Set up Rotation Matrices
                 mat4x4 matRotZ, matRotX;
 
-                matRotZ = MatrixMakeRotationZ(fTheta / 2);
+                matRotZ = MatrixMakeRotationZ(fTheta * 0.5f);
                 matRotX = MatrixMakeRotationX(fTheta);
 
                 mat4x4 matTrans;
-                matTrans = MatrixMakeTranslation(0.0f, 0.0f, 16.0f);
+                matTrans = MatrixMakeTranslation(0.0f, 0.0f, 8.0f);
 
                 mat4x4 matWorld;
                 // matWorld = MatrixMakeIdentity();
@@ -236,10 +231,6 @@ public class Main {
                     triTransformed.p1 = MatrixMultiplyVector(matWorld, tri.p1);
                     triTransformed.p2 = MatrixMultiplyVector(matWorld, tri.p2);
                     triTransformed.p3 = MatrixMultiplyVector(matWorld, tri.p3);
-
-                    triTransformed.p1.z += 8.0f;
-                    triTransformed.p2.z += 8.0f;
-                    triTransformed.p3.z += 8.0f;
 
                     // Calculate Triangle Normal
                     vec3D normal, line1, line2;
@@ -320,9 +311,9 @@ public class Main {
                     g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
                             new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
 
-                    g2d.setColor(Color.WHITE);
-                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
-                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+//                    g2d.setColor(Color.WHITE);
+//                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
+//                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
                 }
 
                 graphics = buffer.getDrawGraphics();
