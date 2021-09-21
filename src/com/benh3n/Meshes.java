@@ -7,13 +7,13 @@ import java.util.Scanner;
 
 public class Meshes {
     public static class vec3D implements Cloneable {
-        double x = 0.0;
-        double y = 0.0;
-        double z = 0.0;
-        double w = 1.0;
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        float w = 1.0f;
         public vec3D(){
         }
-        public vec3D(double x, double y, double z){
+        public vec3D(float x, float y, float z){
             this.x = x;
             this.y = y;
             this.z = z;

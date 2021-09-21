@@ -24,6 +24,7 @@ public class Main {
     static mat4x4 matProj = new mat4x4();
 
     static vec3D vCamera = new vec3D();
+    static vec3D vLookDir;
 
     static float fTheta;
 
@@ -105,6 +106,39 @@ public class Main {
         }
         return matrix;
     }
+    public static mat4x4 MatrixPointAt(vec3D pos, vec3D target, vec3D up) {
+        // Calculate new forward direction
+        vec3D newForward = VectorSub(target, pos);
+        newForward = VectorNormalise(newForward);
+
+        // Calculate new up direction
+        vec3D a = VectorMul(newForward, VectorDotProduct(up, newForward));
+        vec3D newUp = VectorSub(up, a);
+        newUp = VectorNormalise(newUp);
+
+        // New Right direction is easy, its just cross product
+        vec3D newRight = VectorCrossProduct(newUp, newForward);
+
+        // Construct Dimensioning and Translation Matrix
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = newRight.x;	matrix.m[0][1] = newRight.y;	matrix.m[0][2] = newRight.z;	matrix.m[0][3] = 0.0f;
+        matrix.m[1][0] = newUp.x;		matrix.m[1][1] = newUp.y;		matrix.m[1][2] = newUp.z;		matrix.m[1][3] = 0.0f;
+        matrix.m[2][0] = newForward.x;	matrix.m[2][1] = newForward.y;	matrix.m[2][2] = newForward.z;	matrix.m[2][3] = 0.0f;
+        matrix.m[3][0] = pos.x;			matrix.m[3][1] = pos.y;			matrix.m[3][2] = pos.z;			matrix.m[3][3] = 1.0f;
+        return matrix;
+    }
+    public static mat4x4 MatrixQuickInverse(mat4x4 m) { // Only for Rotation/Translation Matrices
+        mat4x4 matrix = new mat4x4();
+        matrix.m[0][0] = m.m[0][0]; matrix.m[0][1] = m.m[1][0]; matrix.m[0][2] = m.m[2][0]; matrix.m[0][3] = 0.0f;
+        matrix.m[1][0] = m.m[0][1]; matrix.m[1][1] = m.m[1][1]; matrix.m[1][2] = m.m[2][1]; matrix.m[1][3] = 0.0f;
+        matrix.m[2][0] = m.m[0][2]; matrix.m[2][1] = m.m[1][2]; matrix.m[2][2] = m.m[2][2]; matrix.m[2][3] = 0.0f;
+        matrix.m[3][0] = -(m.m[3][0] * matrix.m[0][0] + m.m[3][1] * matrix.m[1][0] + m.m[3][2] * matrix.m[2][0]);
+        matrix.m[3][1] = -(m.m[3][0] * matrix.m[0][1] + m.m[3][1] * matrix.m[1][1] + m.m[3][2] * matrix.m[2][1]);
+        matrix.m[3][2] = -(m.m[3][0] * matrix.m[0][2] + m.m[3][1] * matrix.m[1][2] + m.m[3][2] * matrix.m[2][2]);
+        matrix.m[3][3] = 1.0f;
+        return matrix;
+    }
+
     public static vec3D VectorAdd(vec3D v1, vec3D v2) {
         return new vec3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     }
@@ -114,14 +148,11 @@ public class Main {
     public static vec3D VectorMul(vec3D v1, float k) {
         return new vec3D(v1.x * k, v1.y * k, v1.z * k);
     }
-    public static vec3D VectorDiv(vec3D v1, float k, boolean includeZ) {
-        double z = v1.z;
-        if (includeZ)
-            z /= k;
-        return new vec3D(v1.x / k, v1.y / k, z );
+    public static vec3D VectorDiv(vec3D v1, float k) {
+        return new vec3D(v1.x / k, v1.y / k, v1.z / k );
     }
     public static float VectorDotProduct(vec3D v1, vec3D v2) {
-        return (float) (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
     public static float VectorLength(vec3D v) {
         return (float) Math.sqrt(VectorDotProduct(v, v));
@@ -186,7 +217,7 @@ public class Main {
         Color background = Color.BLACK;
 
         // Load Object From File
-        cubeMesh = mesh.loadObjectFromFile("VideoShip.obj");
+        cubeMesh = mesh.loadObjectFromFile("axis.obj");
 
         running = true;
         while (running) {
@@ -210,19 +241,28 @@ public class Main {
                 matRotX = MatrixMakeRotationX(fTheta);
 
                 mat4x4 matTrans;
-                matTrans = MatrixMakeTranslation(0.0f, 0.0f, 8.0f);
+                matTrans = MatrixMakeTranslation(0.0f, 0.0f, 5.0f);
 
                 mat4x4 matWorld;
                 // matWorld = MatrixMakeIdentity();
                 matWorld = MatrixMultiplyMatrix(matRotZ, matRotX);
                 matWorld = MatrixMultiplyMatrix(matWorld, matTrans);
 
+                vLookDir = new vec3D(0, 0, 1);
+                vec3D vUp = new vec3D(0, 1, 0);
+                vec3D vTarget = VectorAdd(vCamera, vLookDir);
+
+                mat4x4 matCamera = MatrixPointAt(vCamera, vTarget, vUp);
+
+                // Make matrix view from camera
+                mat4x4 matView = MatrixQuickInverse(matCamera);
+
                 // Store Triangles for Rastering Later
                 ArrayList<triangle> trianglesToRaster = new ArrayList<>();
 
                 // Draw Triangles
                 for (triangle tri : cubeMesh.tris) {
-                    triangle triProjected = new triangle(), triTransformed = new triangle();
+                    triangle triProjected = new triangle(), triTransformed = new triangle(), triViewed = new triangle();
 
                     triTransformed.p1 = MatrixMultiplyVector(matWorld, tri.p1);
                     triTransformed.p2 = MatrixMultiplyVector(matWorld, tri.p2);
@@ -248,7 +288,7 @@ public class Main {
                     if(VectorDotProduct(normal, vCameraRay) < 0.0f) {
 
                         // Illumination
-                        vec3D lightDirection = new vec3D(0.0f, 0.0f, -1.0f);
+                        vec3D lightDirection = new vec3D(0, 0, -1);
                         lightDirection = VectorNormalise(lightDirection);
 
                         // How "aligned" are light direction and triangle surface normal?
@@ -256,21 +296,34 @@ public class Main {
                         // Choose Colors as Required
                         triTransformed.col = getColor(dp);
 
+                        // Convert World Space --> View Space
+                        triViewed.p1 = MatrixMultiplyVector(matView, triTransformed.p1);
+                        triViewed.p2 = MatrixMultiplyVector(matView, triTransformed.p2);
+                        triViewed.p3 = MatrixMultiplyVector(matView, triTransformed.p3);
+
                         // Project Triangles from 3D --> 2D
-                        triProjected.p1 = MatrixMultiplyVector(matProj, triTransformed.p1);
-                        triProjected.p2 = MatrixMultiplyVector(matProj, triTransformed.p2);
-                        triProjected.p3 = MatrixMultiplyVector(matProj, triTransformed.p3);
+                        triProjected.p1 = MatrixMultiplyVector(matProj, triViewed.p1);
+                        triProjected.p2 = MatrixMultiplyVector(matProj, triViewed.p2);
+                        triProjected.p3 = MatrixMultiplyVector(matProj, triViewed.p3);
                         triProjected.col = triTransformed.col;
 
                         // Scale into view, we moved the normalising into cartesian space
                         // out of the matrix.vector function from the previous video, so
                         // do this manually
-                        triProjected.p1 = VectorDiv(triProjected.p1, (float) triProjected.p1.w, false);
-                        triProjected.p2 = VectorDiv(triProjected.p2, (float) triProjected.p2.w, false);
-                        triProjected.p3 = VectorDiv(triProjected.p3, (float) triProjected.p3.w, false);
+                        triProjected.p1 = VectorDiv(triProjected.p1, triProjected.p1.w);
+                        triProjected.p2 = VectorDiv(triProjected.p2, triProjected.p2.w);
+                        triProjected.p3 = VectorDiv(triProjected.p3, triProjected.p3.w);
+
+                        // X/Y are inverted so put them back
+                        triProjected.p1.x *= -1.0f;
+                        triProjected.p2.x *= -1.0f;
+                        triProjected.p3.x *= -1.0f;
+                        triProjected.p1.y *= -1.0f;
+                        triProjected.p2.y *= -1.0f;
+                        triProjected.p3.y *= -1.0f;
 
                         // Offset verts into visible normalised space
-                        vec3D vOffsetView = new vec3D(1.0f, 1.0f, 0.0f);
+                        vec3D vOffsetView = new vec3D(1, 1, 0);
                         triProjected.p1 = VectorAdd(triProjected.p1, vOffsetView);
                         triProjected.p2 = VectorAdd(triProjected.p2, vOffsetView);
                         triProjected.p3 = VectorAdd(triProjected.p3, vOffsetView);
@@ -299,9 +352,9 @@ public class Main {
                     g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
                             new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
 
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
-                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+//                    g2d.setColor(Color.BLACK);
+//                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
+//                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
                 }
 
                 graphics = buffer.getDrawGraphics();
@@ -314,7 +367,7 @@ public class Main {
                 long end = System.nanoTime();
                 long elapsedTime = end - now;
 
-                fTheta += elapsedTime / 1000000000.0;
+                // fTheta += elapsedTime / 1000000000.0;
 
                 Thread.yield();
 
