@@ -301,7 +301,7 @@ public class Main {
                         lightDirection = VectorNormalise(lightDirection);
 
                         // How "aligned" are light direction and triangle surface normal?
-                        float dp = Math.max(0.01f, VectorDotProduct(lightDirection, normal));
+                        float dp = Math.max(0.1f, VectorDotProduct(lightDirection, normal));
                         // Choose Colors as Required
                         triTransformed.col = getColor(dp);
 
@@ -361,9 +361,9 @@ public class Main {
                     g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
                             new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
 
-//                    g2d.setColor(Color.BLACK);
-//                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
-//                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
+                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
                 }
 
                 graphics = buffer.getDrawGraphics();
