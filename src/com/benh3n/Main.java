@@ -27,6 +27,7 @@ public class Main {
     static vec3D vLookDir;
 
     static float fTheta;
+    static long elapsedTime;
 
     public static vec3D MatrixMultiplyVector(mat4x4 m, vec3D i) {
         vec3D v = new vec3D();
@@ -189,6 +190,14 @@ public class Main {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     running = false;
+                if (e.getKeyCode() == KeyEvent.VK_UP)
+                    vCamera.y += 8.0f * elapsedTime / 30000000;
+                if (e.getKeyCode() == KeyEvent.VK_DOWN)
+                    vCamera.y -= 8.0f * elapsedTime / 30000000;
+                if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+                    vCamera.x -= 8.0f * elapsedTime / 30000000;
+                if (e.getKeyCode() == KeyEvent.VK_LEFT)
+                    vCamera.x += 8.0f * elapsedTime / 30000000;
             }
         });
 
@@ -288,7 +297,7 @@ public class Main {
                     if(VectorDotProduct(normal, vCameraRay) < 0.0f) {
 
                         // Illumination
-                        vec3D lightDirection = new vec3D(0, 0, -1);
+                        vec3D lightDirection = new vec3D(0, 1, -1);
                         lightDirection = VectorNormalise(lightDirection);
 
                         // How "aligned" are light direction and triangle surface normal?
@@ -365,7 +374,7 @@ public class Main {
 
                 bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
                 long end = System.nanoTime();
-                long elapsedTime = end - now;
+                elapsedTime = end - now;
 
                 // fTheta += elapsedTime / 1000000000.0;
 
