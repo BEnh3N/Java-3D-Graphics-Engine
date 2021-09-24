@@ -26,6 +26,8 @@ public class Main {
     static vec3D vCamera = new vec3D();
     static vec3D vLookDir;
 
+    static float fYaw;
+
     static float fTheta;
     static long elapsedTime;
 
@@ -169,6 +171,87 @@ public class Main {
         v.z = v1.x * v2.y - v1.y * v2.x;
         return v;
     }
+    public static vec3D VectorIntersectPlane(vec3D planeP, vec3D planeN, vec3D lineStart, vec3D lineEnd) {
+        planeN = VectorNormalise(planeN);
+        float planeD = -VectorDotProduct(planeN, planeP);
+        float ad = VectorDotProduct(lineStart, planeN);
+        float bd = VectorDotProduct(lineEnd, planeN);
+        float t = (-planeD - ad) / (bd - ad);
+        vec3D lineStartToEnd = VectorSub(lineEnd, lineStart);
+        vec3D lineToIntersect = VectorMul(lineStartToEnd, t);
+        return VectorAdd(lineStart, lineToIntersect);
+    }
+
+    public static float Dist(vec3D p, vec3D planeN, vec3D planeP) {
+        vec3D n = VectorNormalise(p);
+        return (planeN.x * p.x + planeN.y * p.y + planeN.z * p.z - VectorDotProduct(planeN, planeP));
+    }
+
+    public static int TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
+        triangle outTri1;
+        triangle outTri2;
+
+        // Make sure plane normal is indeed normal
+        planeN = VectorNormalise(planeN);
+
+        // Create two temporary storage arrays to classify points either side of plane
+        // If distance sign is positive, point lies on "inside" of plane
+        vec3D[] insidePoints = new vec3D[3];  int nInsidePointCount = 0;
+        vec3D[] outsidePoints = new vec3D[3]; int nOutsidePointCount = 0;
+
+        // Get signed distance of each point in triangle to plane
+        float d0 = Dist(inTri.p1, planeN, planeP);
+        float d1 = Dist(inTri.p2, planeN, planeP);
+        float d2 = Dist(inTri.p3, planeN, planeP);
+
+        if (d0 > 0) { insidePoints[nInsidePointCount++] = inTri.p1; }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p1; }
+        if (d1 > 0) { insidePoints[nInsidePointCount++] = inTri.p2; }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p2; }
+        if (d2 > 0) { insidePoints[nInsidePointCount++] = inTri.p3; }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p3; }
+
+        // Now classify triangle points, and break the input triangle into
+        // smaller output triangles if required. There are four possible
+        // outcomes...
+
+        if (nInsidePointCount == 0)
+        {
+            // All points lie on the outside of plane, so clip whole triangle
+            // It ceases to exist
+
+            return 0; // No returned triangles are valid
+        }
+
+        if (nInsidePointCount == 3)
+        {
+            // All points lie on the inside of plane, so do nothing
+            // and allow the triangle to simply pass through
+            outTri1 = inTri;
+
+            return 1; // Just the one returned original triangle is valid
+        }
+
+        if (nInsidePointCount == 1 && nOutsidePointCount == 2)
+        {
+            // Triangle should be clipped. As two points lie outside
+            // the plane, the triangle simply becomes a smaller triangle
+
+            // Copy appearance info to new triangle
+            outTri1.col =  inTri.col;
+
+            // The inside point is valid, so keep that...
+            outTri1.p1 = insidePoints[0];
+
+            // but the two new points are at the locations where the
+            // original sides of the triangle (lines) intersect with the plane
+            outTri1.p2 = VectorIntersectPlane()plane_p, plane_n, *inside_points[0], *outside_points[0]);
+            outTri1.p3 = VectorIntersectPlane()plane_p, plane_n, *inside_points[0], *outside_points[1]);
+
+            return 1; // Return the newly formed single triangle
+        }
+
+    }
 
     public static short getColor(float lum){
         return (short) Math.abs(lum * 255);
@@ -198,6 +281,18 @@ public class Main {
                     vCamera.x -= 8.0f * elapsedTime / 30000000;
                 if (e.getKeyCode() == KeyEvent.VK_LEFT)
                     vCamera.x += 8.0f * elapsedTime / 30000000;
+
+                vec3D vForward = VectorMul(vLookDir, 8.0f * elapsedTime / 30000000);
+
+                if (e.getKeyCode() == KeyEvent.VK_W)
+                    vCamera = VectorAdd(vCamera, vForward);
+                if (e.getKeyCode() == KeyEvent.VK_S)
+                    vCamera = VectorSub(vCamera, vForward);
+
+                if (e.getKeyCode() == KeyEvent.VK_A)
+                    fYaw -= 2.0f * elapsedTime / 30000000;
+                if (e.getKeyCode() == KeyEvent.VK_D)
+                    fYaw += 2.0f * elapsedTime / 30000000;
             }
         });
 
@@ -257,9 +352,11 @@ public class Main {
                 matWorld = MatrixMultiplyMatrix(matRotZ, matRotX);
                 matWorld = MatrixMultiplyMatrix(matWorld, matTrans);
 
-                vLookDir = new vec3D(0, 0, 1);
                 vec3D vUp = new vec3D(0, 1, 0);
-                vec3D vTarget = VectorAdd(vCamera, vLookDir);
+                vec3D vTarget = new vec3D(0, 0, 1);
+                mat4x4 matCameraRot = MatrixMakeRotationY(fYaw);
+                vLookDir = MatrixMultiplyVector(matCameraRot, vTarget);
+                vTarget = VectorAdd(vCamera, vLookDir);
 
                 mat4x4 matCamera = MatrixPointAt(vCamera, vTarget, vUp);
 
