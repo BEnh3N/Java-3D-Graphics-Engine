@@ -19,6 +19,14 @@ public class Main {
     public static class mat4x4 {
         float[][] m = new float[4][4];
     }
+    public static class returnClip {
+        int numTris;
+        triangle[] tris;
+        public returnClip(int numTris, triangle[] tris) {
+            this.numTris = numTris;
+            this.tris = tris;
+        }
+    }
 
     static mesh cubeMesh = new mesh();
     static mat4x4 matProj = new mat4x4();
@@ -183,13 +191,12 @@ public class Main {
     }
 
     public static float Dist(vec3D p, vec3D planeN, vec3D planeP) {
-        vec3D n = VectorNormalise(p);
+        // vec3D n = VectorNormalise(p);
         return (planeN.x * p.x + planeN.y * p.y + planeN.z * p.z - VectorDotProduct(planeN, planeP));
     }
-
-    public static int TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
-        triangle outTri1;
-        triangle outTri2;
+    public static returnClip TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
+        triangle outTri1 = new triangle();
+        triangle outTri2 = new triangle();
 
         // Make sure plane normal is indeed normal
         planeN = VectorNormalise(planeN);
@@ -204,12 +211,30 @@ public class Main {
         float d1 = Dist(inTri.p2, planeN, planeP);
         float d2 = Dist(inTri.p3, planeN, planeP);
 
-        if (d0 > 0) { insidePoints[nInsidePointCount++] = inTri.p1; }
-        else { outsidePoints[nOutsidePointCount++] = inTri.p1; }
-        if (d1 > 0) { insidePoints[nInsidePointCount++] = inTri.p2; }
-        else { outsidePoints[nOutsidePointCount++] = inTri.p2; }
-        if (d2 > 0) { insidePoints[nInsidePointCount++] = inTri.p3; }
-        else { outsidePoints[nOutsidePointCount++] = inTri.p3; }
+        if (d0 >= 0) {
+            nInsidePointCount++;
+            insidePoints[nInsidePointCount] = inTri.p1;
+        }
+        else {
+            nOutsidePointCount++;
+            outsidePoints[nOutsidePointCount] = inTri.p1;
+        }
+        if (d1 >= 0) {
+            nInsidePointCount++;
+            insidePoints[nInsidePointCount] = inTri.p2;
+        }
+        else {
+            nOutsidePointCount++;
+            outsidePoints[nOutsidePointCount] = inTri.p2;
+        }
+        if (d2 >= 0) {
+            nInsidePointCount++;
+            insidePoints[nInsidePointCount] = inTri.p3;
+        }
+        else {
+            nOutsidePointCount++;
+            outsidePoints[nOutsidePointCount] = inTri.p3;
+        }
 
         // Now classify triangle points, and break the input triangle into
         // smaller output triangles if required. There are four possible
@@ -220,7 +245,7 @@ public class Main {
             // All points lie on the outside of plane, so clip whole triangle
             // It ceases to exist
 
-            return 0; // No returned triangles are valid
+            return new returnClip(0, new triangle[]{null, null}); // No returned triangles are valid
         }
 
         if (nInsidePointCount == 3)
@@ -229,7 +254,7 @@ public class Main {
             // and allow the triangle to simply pass through
             outTri1 = inTri;
 
-            return 1; // Just the one returned original triangle is valid
+            return new returnClip(1, new triangle[]{outTri1, null}); // Just the one returned original triangle is valid
         }
 
         if (nInsidePointCount == 1 && nOutsidePointCount == 2)
@@ -245,12 +270,41 @@ public class Main {
 
             // but the two new points are at the locations where the
             // original sides of the triangle (lines) intersect with the plane
-            outTri1.p2 = VectorIntersectPlane()plane_p, plane_n, *inside_points[0], *outside_points[0]);
-            outTri1.p3 = VectorIntersectPlane()plane_p, plane_n, *inside_points[0], *outside_points[1]);
+            outTri1.p2 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
+            outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1]);
 
-            return 1; // Return the newly formed single triangle
+            return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
         }
 
+        if (nInsidePointCount == 2 && nOutsidePointCount == 1)
+        {
+            // Triangle should be clipped. As two points lie inside the plane,
+            // the clipped triangle becomes a "quad". Fortunately, we can
+            // represent a quad with two new triangles
+
+            // Copy appearance info to new triangles
+            outTri1.col =  inTri.col;
+
+            outTri2.col =  inTri.col;
+
+            // The first triangle consists of the two inside points and a new
+            // point determined by the location where one side of the triangle
+            // intersects with the plane
+            outTri1.p1 = insidePoints[0];
+            outTri1.p2 = insidePoints[1];
+            outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
+
+            // The second triangle is composed of one of he inside points, a
+            // new point determined by the intersection of the other side of the
+            // triangle and the plane, and the newly created point above
+            outTri2.p1 = insidePoints[1];
+            outTri2.p2 = outTri1.p3;
+            outTri2.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
+
+            return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
+        }
+
+        return new returnClip(0, new triangle[]{null, null});
     }
 
     public static short getColor(float lum){
@@ -407,41 +461,50 @@ public class Main {
                         triViewed.p2 = MatrixMultiplyVector(matView, triTransformed.p2);
                         triViewed.p3 = MatrixMultiplyVector(matView, triTransformed.p3);
 
-                        // Project Triangles from 3D --> 2D
-                        triProjected.p1 = MatrixMultiplyVector(matProj, triViewed.p1);
-                        triProjected.p2 = MatrixMultiplyVector(matProj, triViewed.p2);
-                        triProjected.p3 = MatrixMultiplyVector(matProj, triViewed.p3);
-                        triProjected.col = triTransformed.col;
+                        // Clip Viewed Triangle against near plane, this could form two additional
+                        // triangles
+                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 2.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
+                        int nClippedTriangles = clipResult.numTris;
+                        triangle [] clipped = clipResult.tris;
 
-                        // Scale into view, we moved the normalising into cartesian space
-                        // out of the matrix.vector function from the previous video, so
-                        // do this manually
-                        triProjected.p1 = VectorDiv(triProjected.p1, triProjected.p1.w);
-                        triProjected.p2 = VectorDiv(triProjected.p2, triProjected.p2.w);
-                        triProjected.p3 = VectorDiv(triProjected.p3, triProjected.p3.w);
+                        for (int n = 0; n < nClippedTriangles; n++) {
 
-                        // X/Y are inverted so put them back
-                        triProjected.p1.x *= -1.0f;
-                        triProjected.p2.x *= -1.0f;
-                        triProjected.p3.x *= -1.0f;
-                        triProjected.p1.y *= -1.0f;
-                        triProjected.p2.y *= -1.0f;
-                        triProjected.p3.y *= -1.0f;
+                            // Project Triangles from 3D --> 2D
+                            triProjected.p1 = MatrixMultiplyVector(matProj, clipped[n].p1);
+                            triProjected.p2 = MatrixMultiplyVector(matProj, clipped[n].p2);
+                            triProjected.p3 = MatrixMultiplyVector(matProj, clipped[n].p3);
+                            triProjected.col = clipped[n].col;
 
-                        // Offset verts into visible normalised space
-                        vec3D vOffsetView = new vec3D(1, 1, 0);
-                        triProjected.p1 = VectorAdd(triProjected.p1, vOffsetView);
-                        triProjected.p2 = VectorAdd(triProjected.p2, vOffsetView);
-                        triProjected.p3 = VectorAdd(triProjected.p3, vOffsetView);
-                        triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
-                        triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
-                        triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
-                        triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
-                        triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
-                        triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
+                            // Scale into view, we moved the normalising into cartesian space
+                            // out of the matrix.vector function from the previous video, so
+                            // do this manually
+                            triProjected.p1 = VectorDiv(triProjected.p1, triProjected.p1.w);
+                            triProjected.p2 = VectorDiv(triProjected.p2, triProjected.p2.w);
+                            triProjected.p3 = VectorDiv(triProjected.p3, triProjected.p3.w);
 
-                        // Store Triangles for sorting
-                        trianglesToRaster.add(triProjected);
+                            // X/Y are inverted so put them back
+                            triProjected.p1.x *= -1.0f;
+                            triProjected.p2.x *= -1.0f;
+                            triProjected.p3.x *= -1.0f;
+                            triProjected.p1.y *= -1.0f;
+                            triProjected.p2.y *= -1.0f;
+                            triProjected.p3.y *= -1.0f;
+
+                            // Offset verts into visible normalised space
+                            vec3D vOffsetView = new vec3D(1, 1, 0);
+                            triProjected.p1 = VectorAdd(triProjected.p1, vOffsetView);
+                            triProjected.p2 = VectorAdd(triProjected.p2, vOffsetView);
+                            triProjected.p3 = VectorAdd(triProjected.p3, vOffsetView);
+                            triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
+                            triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
+                            triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
+                            triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
+                            triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
+                            triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
+
+                            // Store Triangles for sorting
+                            trianglesToRaster.add(triProjected);
+                        }
                     }
                 }
 
