@@ -191,7 +191,7 @@ public class Main {
     }
 
     public static float Dist(vec3D p, vec3D planeN, vec3D planeP) {
-        // vec3D n = VectorNormalise(p);
+        vec3D n = VectorNormalise(p);
         return (planeN.x * p.x + planeN.y * p.y + planeN.z * p.z - VectorDotProduct(planeN, planeP));
     }
     public static returnClip TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
@@ -203,6 +203,7 @@ public class Main {
 
         // Create two temporary storage arrays to classify points either side of plane
         // If distance sign is positive, point lies on "inside" of plane
+
         vec3D[] insidePoints = new vec3D[3];  int nInsidePointCount = 0;
         vec3D[] outsidePoints = new vec3D[3]; int nOutsidePointCount = 0;
 
@@ -212,53 +213,41 @@ public class Main {
         float d2 = Dist(inTri.p3, planeN, planeP);
 
         if (d0 >= 0) {
-            nInsidePointCount++;
-            insidePoints[nInsidePointCount] = inTri.p1;
+            insidePoints[nInsidePointCount++] = inTri.p1;
+        } else {
+            outsidePoints[nOutsidePointCount++] = inTri.p1;
         }
-        else {
-            nOutsidePointCount++;
-            outsidePoints[nOutsidePointCount] = inTri.p1;
-        }
+
         if (d1 >= 0) {
-            nInsidePointCount++;
-            insidePoints[nInsidePointCount] = inTri.p2;
+            insidePoints[nInsidePointCount++] = inTri.p2;
+        } else {
+            outsidePoints[nOutsidePointCount++] = inTri.p2;
         }
-        else {
-            nOutsidePointCount++;
-            outsidePoints[nOutsidePointCount] = inTri.p2;
-        }
+
         if (d2 >= 0) {
-            nInsidePointCount++;
-            insidePoints[nInsidePointCount] = inTri.p3;
-        }
-        else {
-            nOutsidePointCount++;
-            outsidePoints[nOutsidePointCount] = inTri.p3;
+            insidePoints[nInsidePointCount++] = inTri.p3;
+        } else {
+            outsidePoints[nOutsidePointCount++] = inTri.p3;
         }
 
         // Now classify triangle points, and break the input triangle into
         // smaller output triangles if required. There are four possible
         // outcomes...
 
-        if (nInsidePointCount == 0)
-        {
+        if (nInsidePointCount == 0) {
             // All points lie on the outside of plane, so clip whole triangle
             // It ceases to exist
 
             return new returnClip(0, new triangle[]{null, null}); // No returned triangles are valid
-        }
 
-        if (nInsidePointCount == 3)
-        {
+        } else if (nInsidePointCount == 3) {
             // All points lie on the inside of plane, so do nothing
             // and allow the triangle to simply pass through
             outTri1 = inTri;
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Just the one returned original triangle is valid
-        }
 
-        if (nInsidePointCount == 1 && nOutsidePointCount == 2)
-        {
+        } else if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
             // Triangle should be clipped. As two points lie outside
             // the plane, the triangle simply becomes a smaller triangle
 
@@ -274,17 +263,14 @@ public class Main {
             outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1]);
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
-        }
 
-        if (nInsidePointCount == 2 && nOutsidePointCount == 1)
-        {
+        } else if (nInsidePointCount == 2 && nOutsidePointCount == 1) {
             // Triangle should be clipped. As two points lie inside the plane,
             // the clipped triangle becomes a "quad". Fortunately, we can
             // represent a quad with two new triangles
 
             // Copy appearance info to new triangles
             outTri1.col =  inTri.col;
-
             outTri2.col =  inTri.col;
 
             // The first triangle consists of the two inside points and a new
