@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.function.Consumer;
 
 import com.benh3n.Meshes.*;
 
@@ -190,9 +191,8 @@ public class Main {
         return VectorAdd(lineStart, lineToIntersect);
     }
 
-    public static float Dist(vec3D p, vec3D planeN, vec3D planeP) {
-        vec3D n = VectorNormalise(p);
-        return (planeN.x * p.x + planeN.y * p.y + planeN.z * p.z - VectorDotProduct(planeN, planeP));
+    interface Dist {
+        float dist(vec3D p);
     }
     public static returnClip TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
         triangle outTri1 = new triangle();
@@ -201,34 +201,48 @@ public class Main {
         // Make sure plane normal is indeed normal
         planeN = VectorNormalise(planeN);
 
+        // Return signed shortest distance from point to plane, place normal must be normalised
+        vec3D finalPlaneN = planeN;
+        Dist d = (vec3D p) -> {
+            vec3D n = VectorNormalise(p);
+            return finalPlaneN.x * p.x + finalPlaneN.y * p.y + finalPlaneN.z * p.z - VectorDotProduct(finalPlaneN, planeP);
+        };
+
         // Create two temporary storage arrays to classify points either side of plane
         // If distance sign is positive, point lies on "inside" of plane
-
-        vec3D[] insidePoints = new vec3D[3];  int nInsidePointCount = 0;
+        vec3D[] insidePoints  = new vec3D[3]; int nInsidePointCount  = 0;
         vec3D[] outsidePoints = new vec3D[3]; int nOutsidePointCount = 0;
 
         // Get signed distance of each point in triangle to plane
-        float d0 = Dist(inTri.p1, planeN, planeP);
-        float d1 = Dist(inTri.p2, planeN, planeP);
-        float d2 = Dist(inTri.p3, planeN, planeP);
+        float d0 = d.dist(inTri.p1);
+        float d1 = d.dist(inTri.p2);
+        float d2 = d.dist(inTri.p3);
+        System.out.println(d0);
+        System.out.println(d1);
+        System.out.println(d2);
+        System.out.println(" ");
 
         if (d0 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p1;
+            insidePoints[nInsidePointCount++] = inTri.p1.clone();
         } else {
-            outsidePoints[nOutsidePointCount++] = inTri.p1;
+            outsidePoints[nOutsidePointCount++] = inTri.p1.clone();
         }
 
         if (d1 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p2;
+            insidePoints[nInsidePointCount++] = inTri.p2.clone();
         } else {
-            outsidePoints[nOutsidePointCount++] = inTri.p2;
+            outsidePoints[nOutsidePointCount++] = inTri.p2.clone();
         }
 
         if (d2 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p3;
+            insidePoints[nInsidePointCount++] = inTri.p3.clone();
         } else {
-            outsidePoints[nOutsidePointCount++] = inTri.p3;
+            outsidePoints[nOutsidePointCount++] = inTri.p3.clone();
         }
+
+        System.out.println(nInsidePointCount);
+        System.out.println(nOutsidePointCount);
+        System.out.println(" ");
 
         // Now classify triangle points, and break the input triangle into
         // smaller output triangles if required. There are four possible
