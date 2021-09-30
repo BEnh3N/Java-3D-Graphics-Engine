@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 
 import com.benh3n.Meshes.*;
@@ -283,10 +282,6 @@ public class Main {
 
             // TODO: Fix outTri1 from not rendering, but good job me on fixing the color problem
 
-            System.out.println(Arrays.toString(insidePoints));
-            System.out.println(Arrays.toString(outsidePoints));
-            System.out.println(" ");
-
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
             // intersects with the plane
@@ -463,7 +458,7 @@ public class Main {
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
-                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 2.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
+                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
                         int nClippedTriangles = clipResult.numTris;
                         triangle[] clipped = clipResult.tris;
 
