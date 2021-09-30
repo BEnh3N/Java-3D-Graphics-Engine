@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.function.Consumer;
 
 import com.benh3n.Meshes.*;
 
@@ -205,7 +204,7 @@ public class Main {
         // Return signed shortest distance from point to plane, place normal must be normalised
         vec3D finalPlaneN = planeN;
         Dist d = (vec3D p) -> {
-            vec3D n = VectorNormalise(p);
+            // vec3D n = VectorNormalise(p);
             return finalPlaneN.x * p.x + finalPlaneN.y * p.y + finalPlaneN.z * p.z - VectorDotProduct(finalPlaneN, planeP);
         };
 
@@ -218,10 +217,6 @@ public class Main {
         float d0 = d.dist(inTri.p1);
         float d1 = d.dist(inTri.p2);
         float d2 = d.dist(inTri.p3);
-        System.out.println(d0);
-        System.out.println(d1);
-        System.out.println(d2);
-        System.out.println(" ");
 
         if (d0 >= 0) {
             insidePoints[nInsidePointCount++] = inTri.p1.clone();
@@ -241,10 +236,6 @@ public class Main {
             outsidePoints[nOutsidePointCount++] = inTri.p3.clone();
         }
 
-        System.out.println(nInsidePointCount);
-        System.out.println(nOutsidePointCount);
-        System.out.println(" ");
-
         // Now classify triangle points, and break the input triangle into
         // smaller output triangles if required. There are four possible
         // outcomes...
@@ -252,7 +243,6 @@ public class Main {
         if (nInsidePointCount == 0) {
             // All points lie on the outside of plane, so clip whole triangle
             // It ceases to exist
-            System.out.println("Case 1");
 
             return new returnClip(0, new triangle[]{null, null}); // No returned triangles are valid
 
@@ -260,11 +250,10 @@ public class Main {
             // All points lie on the inside of plane, so do nothing
             // and allow the triangle to simply pass through
             outTri1 = inTri;
-            System.out.println("Case 2");
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Just the one returned original triangle is valid
 
-        } else if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
+        } else if (nOutsidePointCount == 2) {
             // Triangle should be clipped. As two points lie outside
             // the plane, the triangle simply becomes a smaller triangle
 
@@ -278,18 +267,25 @@ public class Main {
             // original sides of the triangle (lines) intersect with the plane
             outTri1.p2 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
             outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1]);
-            System.out.println("Case 3");
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
 
-        } else if (nInsidePointCount == 2 && nOutsidePointCount == 1) {
+        } else {
             // Triangle should be clipped. As two points lie inside the plane,
             // the clipped triangle becomes a "quad". Fortunately, we can
             // represent a quad with two new triangles
 
             // Copy appearance info to new triangles
-            outTri1.col =  inTri.col;
-            outTri2.col =  inTri.col;
+//            outTri1.col =  inTri.col;
+//            outTri2.col =  inTri.col;
+            outTri1.col = new Color(255, 0 ,0);
+            outTri2.col = new Color(0, 0, 255);
+
+            // TODO: Fix outTri1 from not rendering, but good job me on fixing the color problem
+
+            System.out.println(Arrays.toString(insidePoints));
+            System.out.println(Arrays.toString(outsidePoints));
+            System.out.println(" ");
 
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
@@ -304,16 +300,14 @@ public class Main {
             outTri2.p1 = insidePoints[1];
             outTri2.p2 = outTri1.p3;
             outTri2.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
-            System.out.println("Case 4");
 
             return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
-
-        return new returnClip(0, new triangle[]{null, null});
     }
 
-    public static short getColor(float lum){
-        return (short) Math.abs(lum * 255);
+    public static Color getColor(float lum){
+        int col = (int)Math.abs(lum * 255);
+        return new Color(col, col, col);
     }
 
     static boolean running;
@@ -465,6 +459,7 @@ public class Main {
                         triViewed.p1 = MatrixMultiplyVector(matView, triTransformed.p1);
                         triViewed.p2 = MatrixMultiplyVector(matView, triTransformed.p2);
                         triViewed.p3 = MatrixMultiplyVector(matView, triTransformed.p3);
+                        triViewed.col = triTransformed.col;
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
@@ -473,7 +468,6 @@ public class Main {
                         triangle[] clipped = clipResult.tris;
 
                         for (int n = 0; n < nClippedTriangles; n++) {
-                            System.out.println(clipped[n]);
 
                             // Project Triangles from 3D --> 2D
                             triProjected.p1 = MatrixMultiplyVector(matProj, clipped[n].p1);
@@ -508,8 +502,6 @@ public class Main {
                             triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
                             triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
-                            System.out.println(triProjected);
-
                             // Store Triangles for sorting
                             trianglesToRaster.add(triProjected);
                         }
@@ -525,7 +517,7 @@ public class Main {
 
                 for (triangle triToRaster: trianglesToRaster) {
                     // Rasterize Triangles
-                    g2d.setColor(new Color(triToRaster.col, triToRaster.col, triToRaster.col));
+                    g2d.setColor(triToRaster.col);
                     g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
                             new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
 

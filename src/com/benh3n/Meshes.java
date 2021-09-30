@@ -1,5 +1,6 @@
 package com.benh3n;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class Meshes {
         vec3D p1;
         vec3D p2;
         vec3D p3;
-        short col;
+        Color col;
         public triangle(){
         }
         public triangle(vec3D p1, vec3D p2, vec3D p3){
