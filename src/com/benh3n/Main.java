@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
@@ -251,6 +252,7 @@ public class Main {
         if (nInsidePointCount == 0) {
             // All points lie on the outside of plane, so clip whole triangle
             // It ceases to exist
+            System.out.println("Case 1");
 
             return new returnClip(0, new triangle[]{null, null}); // No returned triangles are valid
 
@@ -258,6 +260,7 @@ public class Main {
             // All points lie on the inside of plane, so do nothing
             // and allow the triangle to simply pass through
             outTri1 = inTri;
+            System.out.println("Case 2");
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Just the one returned original triangle is valid
 
@@ -275,6 +278,7 @@ public class Main {
             // original sides of the triangle (lines) intersect with the plane
             outTri1.p2 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
             outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1]);
+            System.out.println("Case 3");
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
 
@@ -300,6 +304,7 @@ public class Main {
             outTri2.p1 = insidePoints[1];
             outTri2.p2 = outTri1.p3;
             outTri2.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
+            System.out.println("Case 4");
 
             return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
@@ -465,9 +470,10 @@ public class Main {
                         // triangles
                         returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 2.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
                         int nClippedTriangles = clipResult.numTris;
-                        triangle [] clipped = clipResult.tris;
+                        triangle[] clipped = clipResult.tris;
 
                         for (int n = 0; n < nClippedTriangles; n++) {
+                            System.out.println(clipped[n]);
 
                             // Project Triangles from 3D --> 2D
                             triProjected.p1 = MatrixMultiplyVector(matProj, clipped[n].p1);
@@ -501,6 +507,8 @@ public class Main {
                             triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
                             triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
                             triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
+
+                            System.out.println(triProjected);
 
                             // Store Triangles for sorting
                             trianglesToRaster.add(triProjected);

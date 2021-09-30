@@ -30,6 +30,10 @@ public class Meshes {
                 throw new AssertionError();
             }
         }
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ", " + z + ")";
+        }
     }
 
     public static class triangle implements Cloneable {
@@ -55,6 +59,10 @@ public class Meshes {
             } catch (CloneNotSupportedException e) {
                 throw new AssertionError();
             }
+        }
+        @Override
+        public String toString() {
+            return p1.toString() + "\n" + p2.toString() + "\n" + p3.toString() + "\n";
         }
     }
 
