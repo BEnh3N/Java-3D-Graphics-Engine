@@ -217,23 +217,12 @@ public class Main {
         float d1 = d.dist(inTri.p2);
         float d2 = d.dist(inTri.p3);
 
-        if (d0 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p1.clone();
-        } else {
-            outsidePoints[nOutsidePointCount++] = inTri.p1.clone();
-        }
-
-        if (d1 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p2.clone();
-        } else {
-            outsidePoints[nOutsidePointCount++] = inTri.p2.clone();
-        }
-
-        if (d2 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p3.clone();
-        } else {
-            outsidePoints[nOutsidePointCount++] = inTri.p3.clone();
-        }
+        if (d0 >= 0) { insidePoints[nInsidePointCount++] = inTri.p1.clone(); }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p1.clone(); }
+        if (d1 >= 0) { insidePoints[nInsidePointCount++] = inTri.p2.clone(); }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p2.clone(); }
+        if (d2 >= 0) { insidePoints[nInsidePointCount++] = inTri.p3.clone(); }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p3.clone(); }
 
         // Now classify triangle points, and break the input triangle into
         // smaller output triangles if required. There are four possible
@@ -295,6 +284,10 @@ public class Main {
             outTri2.p1 = insidePoints[1];
             outTri2.p2 = outTri1.p3;
             outTri2.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
+
+            System.out.println("Tris:");
+            System.out.println(outTri1);
+            System.out.println(outTri2);
 
             return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
@@ -458,11 +451,15 @@ public class Main {
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
-                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
+                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 2.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
                         int nClippedTriangles = clipResult.numTris;
                         triangle[] clipped = clipResult.tris;
 
                         for (int n = 0; n < nClippedTriangles; n++) {
+
+                            if (nClippedTriangles == 2)
+                                System.out.println(n);
+                                System.out.println(clipped[n]);
 
                             // Project Triangles from 3D --> 2D
                             triProjected.p1 = MatrixMultiplyVector(matProj, clipped[n].p1);

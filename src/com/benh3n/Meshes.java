@@ -63,7 +63,7 @@ public class Meshes {
         }
         @Override
         public String toString() {
-            return p1.toString() + "\n" + p2.toString() + "\n" + p3.toString() + "\n";
+            return p1.toString() + "\n" + p2.toString() + "\n" + p3.toString() + "\n" + col + "\n";
         }
     }
 
