@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 
 import com.benh3n.Meshes.*;
@@ -498,14 +499,59 @@ public class Main {
 
                 for (triangle triToRaster: trianglesToRaster) {
 
-                    // Rasterize Triangles
-                    g2d.setColor(triToRaster.col);
-                    g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
-                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+                    // Clip triangles against all four screen edges, this could yield
+                    // a bunch of triangles
+                    triangle[] clipped;
+                    ArrayList<triangle> listTriangles = new ArrayList<>();
 
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},
-                            new int[]{(int) triToRaster.p1.y, (int) triToRaster.p2.y, (int) triToRaster.p3.y}, 3);
+                    // Add initial triangle
+                    listTriangles.add(triToRaster);
+                    int nNewTriangles = 1;
+
+                    for (int p = 0; p < 4; p++) {
+
+                        int nTrisToAdd;
+                        while (nNewTriangles > 0) {
+
+                            // Take triangle from front of queue
+                            triangle test = listTriangles.get(0);
+                            listTriangles.remove(0);
+                            nNewTriangles--;
+
+                            // Clip it against a plane. We only need to test each
+                            // subsequent plane, against subsequent new triangles
+                            // as all triangles after a plane clip are guaranteed
+                            // to lie on the inside of the plane. I like how this
+                            // comment is almost completely and utterly justified
+                            returnClip clip = null;
+                            switch (p) {
+                                case 0: clip = TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(0, 1, 0), test); break;
+                                case 1: clip = TriangleClipAgainstPlane(new vec3D(0, canvas.getHeight() - 1, 0), new vec3D(0, -1, 0), test); break;
+                                case 2: clip = TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(1, 0, 0), test); break;
+                                case 3: clip = TriangleClipAgainstPlane(new vec3D(canvas.getWidth() - 1, 0, 0), new vec3D(-1, 0, 0), test); break;
+                                default: break;
+                            }
+                            nTrisToAdd = clip.numTris;
+                            clipped = clip.tris;
+
+                            // Clipping may yield a variable number of triangles, so
+                            // add these new ones to the back of the queue for subsequent
+                            // clipping against next planes
+                            listTriangles.addAll(Arrays.asList(clipped).subList(0, nTrisToAdd));
+                        }
+                        nNewTriangles = listTriangles.size();
+
+                    }
+
+                    // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+                    for (triangle t : listTriangles) {
+
+                        g2d.setColor(triToRaster.col);
+                        g2d.fillPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
+
+                        g2d.setColor(Color.BLACK);
+                        g2d.drawPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
+                    }
                 }
 
                 graphics = buffer.getDrawGraphics();
