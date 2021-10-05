@@ -39,6 +39,7 @@ public class Main {
     static float fTheta;
     static long elapsedTime;
 
+
     public static vec3D MatrixMultiplyVector(mat4x4 m, vec3D i) {
         vec3D v = new vec3D();
         v.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + i.w * m.m[3][0];
@@ -246,7 +247,7 @@ public class Main {
             // the plane, the triangle simply becomes a smaller triangle
 
             // Copy appearance info to new triangle
-            outTri1.col =  inTri.col;
+            outTri1.col = inTri.col;
 
             // The inside point is valid, so keep that...
             outTri1.p1 = insidePoints[0];
@@ -264,12 +265,8 @@ public class Main {
             // represent a quad with two new triangles
 
             // Copy appearance info to new triangles
-//            outTri1.col =  inTri.col;
-//            outTri2.col =  inTri.col;
-            outTri1.col = new Color(255, 0 ,0);
-            outTri2.col = new Color(0, 0, 255);
-
-            // TODO: Fix outTri1 from not rendering, but good job me on fixing the color problem
+            outTri1.col =  inTri.col;
+            outTri2.col =  inTri.col;
 
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
@@ -284,10 +281,6 @@ public class Main {
             outTri2.p1 = insidePoints[1];
             outTri2.p2 = outTri1.p3;
             outTri2.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
-
-            System.out.println("Tris:");
-            System.out.println(outTri1);
-            System.out.println(outTri2);
 
             return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
@@ -451,15 +444,11 @@ public class Main {
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
-                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 2.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
+                        returnClip clipResult = TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
                         int nClippedTriangles = clipResult.numTris;
                         triangle[] clipped = clipResult.tris;
 
                         for (int n = 0; n < nClippedTriangles; n++) {
-
-                            if (nClippedTriangles == 2)
-                                System.out.println(n);
-                                System.out.println(clipped[n]);
 
                             // Project Triangles from 3D --> 2D
                             triProjected.p1 = MatrixMultiplyVector(matProj, clipped[n].p1);
@@ -495,7 +484,7 @@ public class Main {
                             triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
 
                             // Store Triangles for sorting
-                            trianglesToRaster.add(triProjected);
+                            trianglesToRaster.add(triProjected.clone());
                         }
                     }
                 }
@@ -508,6 +497,7 @@ public class Main {
                 trianglesToRaster.sort(comp.reversed());
 
                 for (triangle triToRaster: trianglesToRaster) {
+
                     // Rasterize Triangles
                     g2d.setColor(triToRaster.col);
                     g2d.fillPolygon(new int[]{(int) triToRaster.p1.x, (int) triToRaster.p2.x, (int) triToRaster.p3.x},

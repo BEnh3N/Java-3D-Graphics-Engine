@@ -81,17 +81,21 @@ public class Meshes {
                 ArrayList<triangle> triList = new ArrayList<>();
                 while (in.hasNextLine()) {
                     String[] line = in.nextLine().split(" ");
-                    if (line[0].equals("v")){
-                        float x = Float.parseFloat(line[1]);
-                        float y = Float.parseFloat(line[2]);
-                        float z = Float.parseFloat(line[3]);
-                        vecList.add(new vec3D(x, y, z));
-                    } else if (line[0].equals("f")){
-                        int p1 = Integer.parseInt(line[1]) - 1;
-                        int p2 = Integer.parseInt(line[2]) - 1;
-                        int p3 = Integer.parseInt(line[3]) - 1;
-                        triangle tri = new triangle(vecList.get(p1), vecList.get(p2), vecList.get(p3));
-                        triList.add(tri);
+                    switch (line[0]) {
+                        case "v":
+                            float x = Float.parseFloat(line[1]);
+                            float y = Float.parseFloat(line[2]);
+                            float z = Float.parseFloat(line[3]);
+                            vecList.add(new vec3D(x, y, z));
+                            break;
+
+                        case "f":
+                            int p1 = Integer.parseInt(line[1]) - 1;
+                            int p2 = Integer.parseInt(line[2]) - 1;
+                            int p3 = Integer.parseInt(line[3]) - 1;
+                            triangle tri = new triangle(vecList.get(p1), vecList.get(p2), vecList.get(p3));
+                            triList.add(tri);
+                            break;
                     }
                 }
                 in.close();
