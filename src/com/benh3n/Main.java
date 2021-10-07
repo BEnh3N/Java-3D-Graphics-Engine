@@ -92,7 +92,7 @@ public class Main {
         Color background = Color.BLACK;
 
         // Load Object From File
-        // meshCube = mesh.loadObjectFromFile("mountains.obj");
+//        meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         meshCube.tris = new ArrayList<>(Arrays.asList(
                 // SOUTH
