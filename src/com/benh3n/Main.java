@@ -249,6 +249,7 @@ public class Main {
 
             // Copy appearance info to new triangle
             outTri1.col = inTri.col;
+            outTri1.col = Color.BLUE;
 
             // The inside point is valid, so keep that...
             outTri1.p1 = insidePoints[0];
@@ -268,6 +269,8 @@ public class Main {
             // Copy appearance info to new triangles
             outTri1.col =  inTri.col;
             outTri2.col =  inTri.col;
+            outTri1.col = Color.GREEN;
+            outTri2.col = Color.RED;
 
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
@@ -333,9 +336,8 @@ public class Main {
 
         Canvas canvas = new Canvas();
         canvas.setIgnoreRepaint(true);
-        // canvas.setSize(256, 240);
-        canvas.setSize(512, 480);
-        // canvas.setSize(1000, 1000);
+//        canvas.setSize(256, 240);
+        canvas.setSize(256 * 2, 240 * 2);
         canvas.setBackground(Color.BLACK);
 
         frame.add(canvas);
@@ -545,8 +547,7 @@ public class Main {
 
                     // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
                     for (triangle t : listTriangles) {
-
-                        g2d.setColor(triToRaster.col);
+                        g2d.setColor(t.col);
                         g2d.fillPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
 
                         g2d.setColor(Color.BLACK);
@@ -556,9 +557,8 @@ public class Main {
 
                 graphics = buffer.getDrawGraphics();
                 graphics.drawImage(bi, 0, 0, null);
-                if (!buffer.contentsLost()) {
+                if (!buffer.contentsLost())
                     buffer.show();
-                }
 
                 bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
                 long end = System.nanoTime();
@@ -569,12 +569,10 @@ public class Main {
                 Thread.yield();
 
             } finally {
-                if (graphics != null) {
+                if (graphics != null)
                     graphics.dispose();
-                }
-                if (g2d != null) {
+                if (g2d != null)
                     g2d.dispose();
-                }
             }
         }
         System.exit(0);
