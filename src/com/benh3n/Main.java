@@ -249,7 +249,7 @@ public class Main {
 
             // Copy appearance info to new triangle
             outTri1.col = inTri.col;
-            outTri1.col = Color.BLUE;
+//            outTri1.col = Color.BLUE;
 
             // The inside point is valid, so keep that...
             outTri1.p1 = insidePoints[0];
@@ -269,8 +269,8 @@ public class Main {
             // Copy appearance info to new triangles
             outTri1.col =  inTri.col;
             outTri2.col =  inTri.col;
-            outTri1.col = Color.GREEN;
-            outTri2.col = Color.RED;
+//            outTri1.col = Color.GREEN;
+//            outTri2.col = Color.RED;
 
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
@@ -358,7 +358,7 @@ public class Main {
         Color background = Color.BLACK;
 
         // Load Object From File
-        cubeMesh = mesh.loadObjectFromFile("axis.obj");
+        cubeMesh = mesh.loadObjectFromFile("mountains.obj");
 
         running = true;
         while (running) {
@@ -550,8 +550,8 @@ public class Main {
                         g2d.setColor(t.col);
                         g2d.fillPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
 
-                        g2d.setColor(Color.BLACK);
-                        g2d.drawPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
+//                        g2d.setColor(Color.BLACK);
+//                        g2d.drawPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
                     }
                 }
 
