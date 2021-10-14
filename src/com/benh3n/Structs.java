@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Meshes {
+public class Structs {
     public static class vec3D implements Cloneable {
         float x = 0.0f;
         float y = 0.0f;

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.benh3n.Meshes.*;
+import com.benh3n.Structs.*;
 import com.benh3n.Util.*;
 
 public class Main {
@@ -45,9 +45,9 @@ public class Main {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     running = false;
-                if (e.getKeyCode() == KeyEvent.VK_UP)
+                if (e.getKeyCode() == KeyEvent.VK_SPACE)
                     vCamera.y += 8.0f * elapsedTime / 30000000;
-                if (e.getKeyCode() == KeyEvent.VK_DOWN)
+                if (e.getKeyCode() == KeyEvent.VK_SHIFT)
                     vCamera.y -= 8.0f * elapsedTime / 30000000;
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT)
                     vCamera.x -= 8.0f * elapsedTime / 30000000;
@@ -120,6 +120,7 @@ public class Main {
                 new triangle(new vec3D(1, 0, 1), new vec3D(0, 0, 0), new vec3D(1, 0, 0))
         ));
 
+        meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         running = true;
         while (running) {

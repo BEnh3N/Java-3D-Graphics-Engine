@@ -1,7 +1,7 @@
 package com.benh3n;
 
 import java.awt.*;
-import com.benh3n.Meshes.*;
+import com.benh3n.Structs.*;
 
 public final class Util {
     private Util() {
