@@ -312,7 +312,7 @@ public class Main {
                         g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
 //                        g2d.setColor(Color.BLACK);
-//                        g2d.drawPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
+//                        g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
                     }
                 }
 
