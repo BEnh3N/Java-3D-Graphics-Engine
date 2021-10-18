@@ -38,24 +38,25 @@ public class Structs {
     }
 
     public static class triangle implements Cloneable {
-        vec3D p1;
-        vec3D p2;
-        vec3D p3;
+        vec3D[] p = new vec3D[3];
         Color col;
         public triangle(){
         }
-        public triangle(vec3D p1, vec3D p2, vec3D p3){
-            this.p1 = p1;
-            this.p2 = p2;
-            this.p3 = p3;
+        public triangle(vec3D p1, vec3D p2, vec3D p3) {
+            this.p = new vec3D[]{p1, p2, p3};
+        }
+        public triangle(float[] p) {
+            this.p = new vec3D[]{
+                    new vec3D(p[0], p[1], p[2]),
+                    new vec3D(p[3], p[4], p[5]),
+                    new vec3D(p[6], p[7], p[8])
+            };
         }
 
         public triangle clone() {
             try {
                 triangle clone = (triangle) super.clone();
-                clone.p1 = this.p1.clone();
-                clone.p2 = this.p2.clone();
-                clone.p3 = this.p3.clone();
+                clone.p = this.p.clone();
                 return clone;
             } catch (CloneNotSupportedException e) {
                 throw new AssertionError();
@@ -63,7 +64,7 @@ public class Structs {
         }
         @Override
         public String toString() {
-            return p1.toString() + "\n" + p2.toString() + "\n" + p3.toString() + "\n" + col + "\n";
+            return p[0].toString() + "\n" + p[1].toString() + "\n" + p[2].toString() + "\n" + col + "\n";
         }
     }
 
@@ -90,10 +91,10 @@ public class Structs {
                             break;
 
                         case "f":
-                            int p1 = Integer.parseInt(line[1]) - 1;
-                            int p2 = Integer.parseInt(line[2]) - 1;
-                            int p3 = Integer.parseInt(line[3]) - 1;
-                            triangle tri = new triangle(vecList.get(p1), vecList.get(p2), vecList.get(p3));
+                            int p0 = Integer.parseInt(line[1]) - 1;
+                            int p1 = Integer.parseInt(line[2]) - 1;
+                            int p2 = Integer.parseInt(line[3]) - 1;
+                            triangle tri = new triangle(vecList.get(p0), vecList.get(p1), vecList.get(p2));
                             triList.add(tri);
                             break;
                     }

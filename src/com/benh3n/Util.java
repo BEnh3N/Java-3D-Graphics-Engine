@@ -193,16 +193,16 @@ public final class Util {
         vec3D[] outsidePoints = new vec3D[3]; int nOutsidePointCount = 0;
 
         // Get signed distance of each point in triangle to plane
-        float d0 = d.dist(inTri.p1);
-        float d1 = d.dist(inTri.p2);
-        float d2 = d.dist(inTri.p3);
+        float d0 = d.dist(inTri.p[0]);
+        float d1 = d.dist(inTri.p[1]);
+        float d2 = d.dist(inTri.p[2]);
 
-        if (d0 >= 0) { insidePoints[nInsidePointCount++] = inTri.p1.clone(); }
-        else { outsidePoints[nOutsidePointCount++] = inTri.p1.clone(); }
-        if (d1 >= 0) { insidePoints[nInsidePointCount++] = inTri.p2.clone(); }
-        else { outsidePoints[nOutsidePointCount++] = inTri.p2.clone(); }
-        if (d2 >= 0) { insidePoints[nInsidePointCount++] = inTri.p3.clone(); }
-        else { outsidePoints[nOutsidePointCount++] = inTri.p3.clone(); }
+        if (d0 >= 0) { insidePoints[nInsidePointCount++] = inTri.p[0].clone(); }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p[0].clone(); }
+        if (d1 >= 0) { insidePoints[nInsidePointCount++] = inTri.p[1].clone(); }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p[1].clone(); }
+        if (d2 >= 0) { insidePoints[nInsidePointCount++] = inTri.p[2].clone(); }
+        else { outsidePoints[nOutsidePointCount++] = inTri.p[2].clone(); }
 
         // Now classify triangle points, and break the input triangle into
         // smaller output triangles if required. There are four possible
@@ -230,12 +230,12 @@ public final class Util {
 //            outTri1.col = Color.BLUE;
 
             // The inside point is valid, so keep that...
-            outTri1.p1 = insidePoints[0];
+            outTri1.p[0] = insidePoints[0];
 
             // but the two new points are at the locations where the
             // original sides of the triangle (lines) intersect with the plane
-            outTri1.p2 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
-            outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1]);
+            outTri1.p[1] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
+            outTri1.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1]);
 
             return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
 
@@ -253,16 +253,16 @@ public final class Util {
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
             // intersects with the plane
-            outTri1.p1 = insidePoints[0];
-            outTri1.p2 = insidePoints[1];
-            outTri1.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
+            outTri1.p[0] = insidePoints[0];
+            outTri1.p[1] = insidePoints[1];
+            outTri1.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0]);
 
             // The second triangle is composed of one of he inside points, a
             // new point determined by the intersection of the other side of the
             // triangle and the plane, and the newly created point above
-            outTri2.p1 = insidePoints[1];
-            outTri2.p2 = outTri1.p3;
-            outTri2.p3 = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
+            outTri2.p[0] = insidePoints[1];
+            outTri2.p[1] = outTri1.p[2];
+            outTri2.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0]);
 
             return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
@@ -270,6 +270,8 @@ public final class Util {
 
     public static Color getColor(float lum){
         int col = (int)Math.abs(lum * 255);
+//        int col = (int)Math.abs(lum * 16);
+//        col = (col * 255) / 16;
         return new Color(col, col, col);
     }
 }
