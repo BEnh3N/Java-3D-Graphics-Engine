@@ -38,24 +38,18 @@ public class Structs {
     }
 
     public static class triangle implements Cloneable {
-        vec3D p1;
-        vec3D p2;
-        vec3D p3;
+        vec3D[] p = new vec3D[3];
         Color col;
         public triangle(){
         }
         public triangle(vec3D p1, vec3D p2, vec3D p3){
-            this.p1 = p1;
-            this.p2 = p2;
-            this.p3 = p3;
+            this.p = new vec3D[]{p1, p2, p3};
         }
 
         public triangle clone() {
             try {
                 triangle clone = (triangle) super.clone();
-                clone.p1 = this.p1.clone();
-                clone.p2 = this.p2.clone();
-                clone.p3 = this.p3.clone();
+                clone.p = this.p.clone();
                 return clone;
             } catch (CloneNotSupportedException e) {
                 throw new AssertionError();
@@ -63,7 +57,7 @@ public class Structs {
         }
         @Override
         public String toString() {
-            return p1.toString() + "\n" + p2.toString() + "\n" + p3.toString() + "\n" + col + "\n";
+            return p[0].toString() + "\n" + p[1].toString() + "\n" + p[2].toString() + "\n" + col + "\n";
         }
     }
 

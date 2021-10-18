@@ -168,16 +168,16 @@ public class Main {
                 for (triangle tri : meshCube.tris) {
                     triangle triProjected = new triangle(), triTransformed = new triangle(), triViewed = new triangle();
 
-                    triTransformed.p1 = Util.MatrixMultiplyVector(matWorld, tri.p1);
-                    triTransformed.p2 = Util.MatrixMultiplyVector(matWorld, tri.p2);
-                    triTransformed.p3 = Util.MatrixMultiplyVector(matWorld, tri.p3);
+                    triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
+                    triTransformed.p[1] = Util.MatrixMultiplyVector(matWorld, tri.p[1]);
+                    triTransformed.p[2] = Util.MatrixMultiplyVector(matWorld, tri.p[2]);
 
                     // Calculate Triangle Normal
                     vec3D normal, line1, line2;
 
                     // Get lines either side of triangle
-                    line1 = Util.VectorSub(triTransformed.p2, triTransformed.p1);
-                    line2 = Util.VectorSub(triTransformed.p3, triTransformed.p1);
+                    line1 = Util.VectorSub(triTransformed.p[1], triTransformed.p[0]);
+                    line2 = Util.VectorSub(triTransformed.p[2], triTransformed.p[0]);
 
                     // Take Cross Product of lines to get normal to triangle surface
                     normal = Util.VectorCrossProduct(line1, line2);
@@ -186,7 +186,7 @@ public class Main {
                     normal = Util.VectorNormalise(normal);
 
                     // Get Ray from Triangle to Camera
-                    vec3D vCameraRay = Util.VectorSub(triTransformed.p1, vCamera);
+                    vec3D vCameraRay = Util.VectorSub(triTransformed.p[0], vCamera);
 
                     // If ray is aligned with normal, then triangle is visible
                     if(Util.VectorDotProduct(normal, vCameraRay) < 0.0f) {
@@ -201,9 +201,9 @@ public class Main {
                         triTransformed.col = Util.getColor(dp);
 
                         // Convert World Space --> View Space
-                        triViewed.p1 = Util.MatrixMultiplyVector(matView, triTransformed.p1);
-                        triViewed.p2 = Util.MatrixMultiplyVector(matView, triTransformed.p2);
-                        triViewed.p3 = Util.MatrixMultiplyVector(matView, triTransformed.p3);
+                        triViewed.p[0] = Util.MatrixMultiplyVector(matView, triTransformed.p[0]);
+                        triViewed.p[1] = Util.MatrixMultiplyVector(matView, triTransformed.p[1]);
+                        triViewed.p[2] = Util.MatrixMultiplyVector(matView, triTransformed.p[2]);
                         triViewed.col = triTransformed.col;
 
                         // Clip Viewed Triangle against near plane, this could form two additional
@@ -215,37 +215,37 @@ public class Main {
                         for (int n = 0; n < nClippedTriangles; n++) {
 
                             // Project Triangles from 3D --> 2D
-                            triProjected.p1 = Util.MatrixMultiplyVector(matProj, clipped[n].p1);
-                            triProjected.p2 = Util.MatrixMultiplyVector(matProj, clipped[n].p2);
-                            triProjected.p3 = Util.MatrixMultiplyVector(matProj, clipped[n].p3);
+                            triProjected.p[0] = Util.MatrixMultiplyVector(matProj, clipped[n].p[0]);
+                            triProjected.p[1] = Util.MatrixMultiplyVector(matProj, clipped[n].p[1]);
+                            triProjected.p[2] = Util.MatrixMultiplyVector(matProj, clipped[n].p[2]);
                             triProjected.col = clipped[n].col;
 
                             // Scale into view, we moved the normalising into cartesian space
                             // out of the matrix.vector function from the previous video, so
                             // do this manually
-                            triProjected.p1 = Util.VectorDiv(triProjected.p1, triProjected.p1.w);
-                            triProjected.p2 = Util.VectorDiv(triProjected.p2, triProjected.p2.w);
-                            triProjected.p3 = Util.VectorDiv(triProjected.p3, triProjected.p3.w);
+                            triProjected.p[0] = Util.VectorDiv(triProjected.p[0], triProjected.p[0].w);
+                            triProjected.p[1] = Util.VectorDiv(triProjected.p[1], triProjected.p[1].w);
+                            triProjected.p[2] = Util.VectorDiv(triProjected.p[2], triProjected.p[2].w);
 
                             // X/Y are inverted so put them back
-                            triProjected.p1.x *= -1.0f;
-                            triProjected.p2.x *= -1.0f;
-                            triProjected.p3.x *= -1.0f;
-                            triProjected.p1.y *= -1.0f;
-                            triProjected.p2.y *= -1.0f;
-                            triProjected.p3.y *= -1.0f;
+                            triProjected.p[0].x *= -1.0f;
+                            triProjected.p[1].x *= -1.0f;
+                            triProjected.p[2].x *= -1.0f;
+                            triProjected.p[0].y *= -1.0f;
+                            triProjected.p[1].y *= -1.0f;
+                            triProjected.p[2].y *= -1.0f;
 
                             // Offset verts into visible normalised space
                             vec3D vOffsetView = new vec3D(1, 1, 0);
-                            triProjected.p1 = Util.VectorAdd(triProjected.p1, vOffsetView);
-                            triProjected.p2 = Util.VectorAdd(triProjected.p2, vOffsetView);
-                            triProjected.p3 = Util.VectorAdd(triProjected.p3, vOffsetView);
-                            triProjected.p1.x *= 0.5f * (float) canvas.getWidth();
-                            triProjected.p1.y *= 0.5f * (float) canvas.getHeight();
-                            triProjected.p2.x *= 0.5f * (float) canvas.getWidth();
-                            triProjected.p2.y *= 0.5f * (float) canvas.getHeight();
-                            triProjected.p3.x *= 0.5f * (float) canvas.getWidth();
-                            triProjected.p3.y *= 0.5f * (float) canvas.getHeight();
+                            triProjected.p[0] = Util.VectorAdd(triProjected.p[0], vOffsetView);
+                            triProjected.p[1] = Util.VectorAdd(triProjected.p[1], vOffsetView);
+                            triProjected.p[2] = Util.VectorAdd(triProjected.p[2], vOffsetView);
+                            triProjected.p[0].x *= 0.5f * (float) canvas.getWidth();
+                            triProjected.p[0].y *= 0.5f * (float) canvas.getHeight();
+                            triProjected.p[1].x *= 0.5f * (float) canvas.getWidth();
+                            triProjected.p[1].y *= 0.5f * (float) canvas.getHeight();
+                            triProjected.p[2].x *= 0.5f * (float) canvas.getWidth();
+                            triProjected.p[2].y *= 0.5f * (float) canvas.getHeight();
 
                             // Store Triangles for sorting
                             trianglesToRaster.add(triProjected.clone());
@@ -254,8 +254,8 @@ public class Main {
                 }
 
                 Comparator<triangle> comp = (triangle t1, triangle t2) -> {
-                    double z1 = (t1.p1.z + t1.p2.z + t1.p3.z) / 3.0;
-                    double z2 = (t2.p1.z + t2.p2.z + t2.p3.z) / 3.0;
+                    double z1 = (t1.p[0].z + t1.p[1].z + t1.p[2].z) / 3.0;
+                    double z2 = (t2.p[0].z + t2.p[1].z + t2.p[2].z) / 3.0;
                     return Double.compare(z1, z2);
                 };
                 trianglesToRaster.sort(comp.reversed());
@@ -309,7 +309,7 @@ public class Main {
                     // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
                     for (triangle t : listTriangles) {
                         g2d.setColor(t.col);
-                        g2d.fillPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
+                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
 //                        g2d.setColor(Color.BLACK);
 //                        g2d.drawPolygon(new int[]{(int) t.p1.x, (int) t.p2.x, (int) t.p3.x}, new int[]{(int) t.p1.y, (int) t.p2.y, (int) t.p3.y}, 3);
