@@ -42,8 +42,15 @@ public class Structs {
         Color col;
         public triangle(){
         }
-        public triangle(vec3D p1, vec3D p2, vec3D p3){
+        public triangle(vec3D p1, vec3D p2, vec3D p3) {
             this.p = new vec3D[]{p1, p2, p3};
+        }
+        public triangle(float[] p) {
+            this.p = new vec3D[]{
+                    new vec3D(p[0], p[1], p[2]),
+                    new vec3D(p[3], p[4], p[5]),
+                    new vec3D(p[6], p[7], p[8])
+            };
         }
 
         public triangle clone() {

@@ -270,6 +270,8 @@ public final class Util {
 
     public static Color getColor(float lum){
         int col = (int)Math.abs(lum * 255);
+//        int col = (int)Math.abs(lum * 16);
+//        col = (col * 255) / 16;
         return new Color(col, col, col);
     }
 }

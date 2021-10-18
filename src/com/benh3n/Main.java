@@ -96,31 +96,26 @@ public class Main {
 
         meshCube.tris = new ArrayList<>(Arrays.asList(
                 // SOUTH
-                new triangle(new vec3D(0, 0, 0), new vec3D(0, 1, 0), new vec3D(1, 1, 0)),
-                new triangle(new vec3D(0, 0, 0), new vec3D(1, 1, 0), new vec3D(1, 0, 0)),
-
+                new triangle(new float[]{0, 0, 0, 0, 1, 0, 1, 1, 0}),
+                new triangle(new float[]{0, 0, 0, 1, 1, 0, 1, 0, 0}),
                 // EAST
-                new triangle(new vec3D(1, 0, 0), new vec3D(1, 1, 0), new vec3D(1, 1, 1)),
-                new triangle(new vec3D(1, 0, 0), new vec3D(1, 1, 1), new vec3D(1, 0, 1)),
-
+                new triangle(new float[]{1, 0, 0, 1, 1, 0, 1, 1, 1}),
+                new triangle(new float[]{1, 0, 0, 1, 1, 1, 1, 0, 1}),
                 // NORTH
-                new triangle(new vec3D(1, 0, 1), new vec3D(1, 1, 1), new vec3D(0, 1, 1)),
-                new triangle(new vec3D(1, 0, 1), new vec3D(0, 1, 1), new vec3D(0, 0, 1)),
-
+                new triangle(new float[]{1, 0, 1, 1, 1, 1, 0, 1, 1}),
+                new triangle(new float[]{1, 0, 1, 0, 1, 1, 0, 0, 1}),
                 // WEST
-                new triangle(new vec3D(0, 0, 1), new vec3D(0, 1, 1), new vec3D(0, 1, 0)),
-                new triangle(new vec3D(0, 0, 1), new vec3D(0, 1, 0), new vec3D(0, 0, 0)),
-
+                new triangle(new float[]{0, 0, 1, 0, 1, 1, 0, 1, 0}),
+                new triangle(new float[]{0, 0, 1, 0, 1, 0, 0, 0, 0}),
                 // TOP
-                new triangle(new vec3D(0, 1, 0), new vec3D(0, 1, 1), new vec3D(1, 1, 1)),
-                new triangle(new vec3D(0, 1, 0), new vec3D(1, 1, 1), new vec3D(1, 1, 0)),
-
+                new triangle(new float[]{0, 1, 0, 0, 1, 1, 1, 1, 1}),
+                new triangle(new float[]{0, 1, 0, 1, 1, 1, 1, 1, 0}),
                 // BOTTOM
-                new triangle(new vec3D(1, 0, 1), new vec3D(0, 0, 1), new vec3D(0, 0, 0)),
-                new triangle(new vec3D(1, 0, 1), new vec3D(0, 0, 0), new vec3D(1, 0, 0))
+                new triangle(new float[]{1, 0, 1, 0, 0, 1, 0, 0, 0}),
+                new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0})
         ));
 
-        meshCube = mesh.loadObjectFromFile("mountains.obj");
+        // meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         running = true;
         while (running) {
