@@ -115,7 +115,7 @@ public class Main {
                 new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0})
         ));
 
-        // meshCube = mesh.loadObjectFromFile("mountains.obj");
+        meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         running = true;
         while (running) {

@@ -91,10 +91,10 @@ public class Structs {
                             break;
 
                         case "f":
-                            int p1 = Integer.parseInt(line[1]) - 1;
-                            int p2 = Integer.parseInt(line[2]) - 1;
-                            int p3 = Integer.parseInt(line[3]) - 1;
-                            triangle tri = new triangle(vecList.get(p1), vecList.get(p2), vecList.get(p3));
+                            int p0 = Integer.parseInt(line[1]) - 1;
+                            int p1 = Integer.parseInt(line[2]) - 1;
+                            int p2 = Integer.parseInt(line[3]) - 1;
+                            triangle tri = new triangle(vecList.get(p0), vecList.get(p1), vecList.get(p2));
                             triList.add(tri);
                             break;
                     }
