@@ -96,23 +96,23 @@ public class Main {
 
         meshCube.tris = new ArrayList<>(Arrays.asList(
                 // SOUTH
-                new triangle(new float[]{0, 0, 0, 0, 1, 0, 1, 1, 0}),
-                new triangle(new float[]{0, 0, 0, 1, 1, 0, 1, 0, 0}),
+                new triangle(new float[]{0, 0, 0, 0, 1, 0, 1, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
+                new triangle(new float[]{0, 0, 0, 1, 1, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
                 // EAST
-                new triangle(new float[]{1, 0, 0, 1, 1, 0, 1, 1, 1}),
-                new triangle(new float[]{1, 0, 0, 1, 1, 1, 1, 0, 1}),
+                new triangle(new float[]{1, 0, 0, 1, 1, 0, 1, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
+                new triangle(new float[]{1, 0, 0, 1, 1, 1, 1, 0, 1}, new float[]{0, 1, 1, 0, 1, 1}),
                 // NORTH
-                new triangle(new float[]{1, 0, 1, 1, 1, 1, 0, 1, 1}),
-                new triangle(new float[]{1, 0, 1, 0, 1, 1, 0, 0, 1}),
+                new triangle(new float[]{1, 0, 1, 1, 1, 1, 0, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
+                new triangle(new float[]{1, 0, 1, 0, 1, 1, 0, 0, 1}, new float[]{0, 1, 1, 0, 1, 1}),
                 // WEST
-                new triangle(new float[]{0, 0, 1, 0, 1, 1, 0, 1, 0}),
-                new triangle(new float[]{0, 0, 1, 0, 1, 0, 0, 0, 0}),
+                new triangle(new float[]{0, 0, 1, 0, 1, 1, 0, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
+                new triangle(new float[]{0, 0, 1, 0, 1, 0, 0, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
                 // TOP
-                new triangle(new float[]{0, 1, 0, 0, 1, 1, 1, 1, 1}),
-                new triangle(new float[]{0, 1, 0, 1, 1, 1, 1, 1, 0}),
+                new triangle(new float[]{0, 1, 0, 0, 1, 1, 1, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
+                new triangle(new float[]{0, 1, 0, 1, 1, 1, 1, 1, 0}, new float[]{0, 1, 1, 0, 1, 1}),
                 // BOTTOM
-                new triangle(new float[]{1, 0, 1, 0, 0, 1, 0, 0, 0}),
-                new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0})
+                new triangle(new float[]{1, 0, 1, 0, 0, 1, 0, 0, 0}, new float[]{0, 1, 0, 0, 1, 0}),
+                new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
         ));
 
         running = true;
@@ -164,6 +164,7 @@ public class Main {
                     triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
                     triTransformed.p[1] = Util.MatrixMultiplyVector(matWorld, tri.p[1]);
                     triTransformed.p[2] = Util.MatrixMultiplyVector(matWorld, tri.p[2]);
+                    triTransformed.t = tri.t.clone();
 
                     // Calculate Triangle Normal
                     vec3D normal, line1, line2;
@@ -198,12 +199,14 @@ public class Main {
                         triViewed.p[1] = Util.MatrixMultiplyVector(matView, triTransformed.p[1]);
                         triViewed.p[2] = Util.MatrixMultiplyVector(matView, triTransformed.p[2]);
                         triViewed.col = triTransformed.col;
+                        triViewed.t = triTransformed.t.clone();
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
-                        returnClip clipResult = Util.TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
-                        int nClippedTriangles = clipResult.numTris;
-                        triangle[] clipped = clipResult.tris;
+                        triangle[] clipped = new triangle[2];
+                        int nClippedTriangles = Util.TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed, clipped);
+//                        int nClippedTriangles = clipResult.numTris;
+//                        triangle[] clipped = clipResult.tris;
 
                         for (int n = 0; n < nClippedTriangles; n++) {
 
@@ -212,6 +215,7 @@ public class Main {
                             triProjected.p[1] = Util.MatrixMultiplyVector(matProj, clipped[n].p[1]);
                             triProjected.p[2] = Util.MatrixMultiplyVector(matProj, clipped[n].p[2]);
                             triProjected.col = clipped[n].col;
+                            triProjected.t = clipped[n].t.clone();
 
                             // Scale into view, we moved the normalising into cartesian space
                             // out of the matrix.vector function from the previous video, so
@@ -257,7 +261,7 @@ public class Main {
 
                     // Clip triangles against all four screen edges, this could yield
                     // a bunch of triangles
-                    triangle[] clipped;
+                    triangle[] clipped = new triangle[2];
                     ArrayList<triangle> listTriangles = new ArrayList<>();
 
                     // Add initial triangle
@@ -266,7 +270,7 @@ public class Main {
 
                     for (int p = 0; p < 4; p++) {
 
-                        int nTrisToAdd;
+                        int nTrisToAdd = 0;
                         while (nNewTriangles > 0) {
 
                             // Take triangle from front of queue
@@ -279,16 +283,16 @@ public class Main {
                             // as all triangles after a plane clip are guaranteed
                             // to lie on the inside of the plane. I like how this
                             // comment is almost completely and utterly justified
-                            returnClip clip = null;
+//                            returnClip clip = null;
                             switch (p) {
-                                case 0: clip = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(0, 1, 0), test); break;
-                                case 1: clip = Util.TriangleClipAgainstPlane(new vec3D(0, canvas.getHeight() - 1, 0), new vec3D(0, -1, 0), test); break;
-                                case 2: clip = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(1, 0, 0), test); break;
-                                case 3: clip = Util.TriangleClipAgainstPlane(new vec3D(canvas.getWidth() - 1, 0, 0), new vec3D(-1, 0, 0), test); break;
+                                case 0: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(0, 1, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
+                                case 1: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(0, canvas.getHeight() - 1, 0), new vec3D(0, -1, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
+                                case 2: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(1, 0, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
+                                case 3: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(canvas.getWidth() - 1, 0, 0), new vec3D(-1, 0, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
                                 default: break;
                             }
-                            nTrisToAdd = clip.numTris;
-                            clipped = clip.tris;
+//                            nTrisToAdd = clip.numTris;
+//                            clipped = clip.tris;
 
                             // Clipping may yield a variable number of triangles, so
                             // add these new ones to the back of the queue for subsequent
@@ -301,11 +305,11 @@ public class Main {
 
                     // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
                     for (triangle t : listTriangles) {
-                        g2d.setColor(t.col);
-                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
+//                        g2d.setColor(t.col);
+//                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
-//                        g2d.setColor(Color.BLACK);
-//                        g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
+                        g2d.setColor(Color.WHITE);
+                        g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
                     }
                 }
 
