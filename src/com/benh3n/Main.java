@@ -115,6 +115,8 @@ public class Main {
                 new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
         ));
 
+        // meshCube = mesh.loadObjectFromFile("mountains.obj");
+
         running = true;
         while (running) {
             try {
@@ -203,10 +205,9 @@ public class Main {
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
-                        triangle[] clipped = new triangle[2];
-                        int nClippedTriangles = Util.TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed, clipped);
-//                        int nClippedTriangles = clipResult.numTris;
-//                        triangle[] clipped = clipResult.tris;
+                        returnClip clipResult = Util.TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
+                        int nClippedTriangles = clipResult.numTris;
+                        triangle[] clipped = clipResult.tris;
 
                         for (int n = 0; n < nClippedTriangles; n++) {
 
@@ -261,7 +262,7 @@ public class Main {
 
                     // Clip triangles against all four screen edges, this could yield
                     // a bunch of triangles
-                    triangle[] clipped = new triangle[2];
+                    triangle[] clipped;
                     ArrayList<triangle> listTriangles = new ArrayList<>();
 
                     // Add initial triangle
@@ -270,7 +271,7 @@ public class Main {
 
                     for (int p = 0; p < 4; p++) {
 
-                        int nTrisToAdd = 0;
+                        int nTrisToAdd;
                         while (nNewTriangles > 0) {
 
                             // Take triangle from front of queue
@@ -283,16 +284,17 @@ public class Main {
                             // as all triangles after a plane clip are guaranteed
                             // to lie on the inside of the plane. I like how this
                             // comment is almost completely and utterly justified
-//                            returnClip clip = null;
+                            returnClip clip = null;
+
                             switch (p) {
-                                case 0: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(0, 1, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
-                                case 1: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(0, canvas.getHeight() - 1, 0), new vec3D(0, -1, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
-                                case 2: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(1, 0, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
-                                case 3: nTrisToAdd = Util.TriangleClipAgainstPlane(new vec3D(canvas.getWidth() - 1, 0, 0), new vec3D(-1, 0, 0), test, new triangle[]{clipped[0], clipped[1]}); break;
+                                case 0: clip = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(0, 1, 0), test); break;
+                                case 1: clip = Util.TriangleClipAgainstPlane(new vec3D(0, canvas.getHeight() - 1, 0), new vec3D(0, -1, 0), test); break;
+                                case 2: clip = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(1, 0, 0), test); break;
+                                case 3: clip = Util.TriangleClipAgainstPlane(new vec3D(canvas.getWidth() - 1, 0, 0), new vec3D(-1, 0, 0), test); break;
                                 default: break;
                             }
-//                            nTrisToAdd = clip.numTris;
-//                            clipped = clip.tris;
+                            nTrisToAdd = clip.numTris;
+                            clipped = clip.tris;
 
                             // Clipping may yield a variable number of triangles, so
                             // add these new ones to the back of the queue for subsequent

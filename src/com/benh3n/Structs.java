@@ -98,7 +98,7 @@ public class Structs {
         }
         @Override
         public String toString() {
-            return p[0].toString() + "\n" + p[1].toString() + "\n" + p[2].toString() + "\n" + col + "\n"
+            return p[0] + "\n" + p[1] + "\n" + p[2] + "\n" + col + "\n"
                     + t[0] + "\n" + t[1] + "\n" + t[2] + "\n";
         }
     }

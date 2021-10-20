@@ -174,9 +174,9 @@ public final class Util {
     interface Dist {
         float dist(vec3D p);
     }
-    public static int TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri, triangle[] outTris) {
-//        triangle outTri1 = new triangle(new float[]{0, 0, 0, 0, 0, 0, 0, 0 ,0}, new float[]{0, 0, 0, 0, 0, 0});
-//        triangle outTri2 = new triangle();
+    public static returnClip TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
+        triangle outTri1 = new triangle();
+        triangle outTri2 = new triangle();
 
         // Make sure plane normal is indeed normal
         planeN = VectorNormalise(planeN);
@@ -227,39 +227,39 @@ public final class Util {
             // All points lie on the outside of plane, so clip whole triangle
             // It ceases to exist
 
-            return 0; // No returned triangles are valid
+            return new returnClip(0, new triangle[]{null, null}); // No returned triangles are valid
 
         } else if (nInsidePointCount == 3) {
             // All points lie on the inside of plane, so do nothing
             // and allow the triangle to simply pass through
-            outTris[0] = inTri;
+            outTri1 = inTri;
 
-            return 1; // Just the one returned original triangle is valid
+            return new returnClip(1, new triangle[]{outTri1, null}); // Just the one returned original triangle is valid
 
         } else if (nOutsidePointCount == 2) {
             // Triangle should be clipped. As two points lie outside
             // the plane, the triangle simply becomes a smaller triangle
 
             // Copy appearance info to new triangle
-            outTris[0].col = inTri.col;
+            outTri1.col = inTri.col;
 //            outTri1.col = Color.BLUE;
 
             // The inside point is valid, so keep that...
-            outTris[0].p[0] = insidePoints[0];
-            outTris[0].t[0] = insideTex[0];
+            outTri1.p[0] = insidePoints[0];
+//            outTri1.t[0] = insideTex[0];
 
             // but the two new points are at the locations where the
             // original sides of the triangle (lines) intersect with the plane
             float[] t = {0};
-            outTris[0].p[1] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
-            outTris[0].t[1].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
-            outTris[0].t[1].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
+            outTri1.p[1] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
+//            outTri1.t[1].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
+//            outTri1.t[1].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
 
-            outTris[0].p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1], t);
-            outTris[0].t[2].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
-            outTris[0].t[2].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
+            outTri1.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1], t);
+//            outTri1.t[2].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
+//            outTri1.t[2].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
 
-            return 1; // Return the newly formed single triangle
+            return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
 
         } else {
             // Triangle should be clipped. As two points lie inside the plane,
@@ -267,37 +267,35 @@ public final class Util {
             // represent a quad with two new triangles
 
             // Copy appearance info to new triangles
-            outTris[0].col =  inTri.col;
-            outTris[1].col =  inTri.col;
+            outTri1.col =  inTri.col;
+            outTri2.col =  inTri.col;
 //            outTri1.col = Color.GREEN;
 //            outTri2.col = Color.RED;
 
             // The first triangle consists of the two inside points and a new
             // point determined by the location where one side of the triangle
             // intersects with the plane
-            outTris[0].p[0] = insidePoints[0];
-            outTris[0].p[1] = insidePoints[1];
-            outTris[0].t[0] = insideTex[0];
-            outTris[0].t[1] = insideTex[1];
+            outTri1.p[0] = insidePoints[0];
+            outTri1.p[1] = insidePoints[1];
+//            outTri1.t[0] = insideTex[0];
+//            outTri1.t[1] = insideTex[1];
 
             float[] t = {0};
-            outTris[0].p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
+            outTri1.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
 
             // The second triangle is composed of one of the inside points, a
             // new point determined by the intersection of the other side of the
             // triangle and the plane, and the newly created point above
-            outTris[1].p[0] = insidePoints[1];
-            outTris[1].p[1] = outTris[0].p[2];
-            outTris[1].p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0], t);
+            outTri2.p[0] = insidePoints[1];
+            outTri2.p[1] = outTri1.p[2];
+            outTri2.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0], t);
 
-            return 2; // Return two newly formed triangles which form a quad
+            return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
     }
 
     public static Color getColor(float lum){
         int col = (int)Math.abs(lum * 255);
-//        int col = (int)Math.abs(lum * 16);
-//        col = (col * 255) / 16;
         return new Color(col, col, col);
     }
 }
