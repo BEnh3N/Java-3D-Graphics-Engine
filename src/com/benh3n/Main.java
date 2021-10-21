@@ -41,20 +41,22 @@ public class Main {
         frame.setIgnoreRepaint(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        int moveScale = 50000000;
+
         frame.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     running = false;
                 if (e.getKeyCode() == KeyEvent.VK_SPACE)
-                    vCamera.y += 8.0f * elapsedTime / 30000000;
+                    vCamera.y += 8.0f * elapsedTime / moveScale;
                 if (e.getKeyCode() == KeyEvent.VK_SHIFT)
-                    vCamera.y -= 8.0f * elapsedTime / 30000000;
+                    vCamera.y -= 8.0f * elapsedTime / moveScale;
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-                    vCamera.x -= 8.0f * elapsedTime / 30000000;
+                    vCamera.x -= 8.0f * elapsedTime / moveScale;
                 if (e.getKeyCode() == KeyEvent.VK_LEFT)
-                    vCamera.x += 8.0f * elapsedTime / 30000000;
+                    vCamera.x += 8.0f * elapsedTime / moveScale;
 
-                vec3D vForward = Util.VectorMul(vLookDir, 8.0f * elapsedTime / 30000000);
+                vec3D vForward = Util.VectorMul(vLookDir, 8.0f * elapsedTime / moveScale);
 
                 if (e.getKeyCode() == KeyEvent.VK_W)
                     vCamera = Util.VectorAdd(vCamera, vForward);
@@ -62,9 +64,9 @@ public class Main {
                     vCamera = Util.VectorSub(vCamera, vForward);
 
                 if (e.getKeyCode() == KeyEvent.VK_A)
-                    fYaw -= 2.0f * elapsedTime / 30000000;
+                    fYaw -= 2.0f * elapsedTime / moveScale;
                 if (e.getKeyCode() == KeyEvent.VK_D)
-                    fYaw += 2.0f * elapsedTime / 30000000;
+                    fYaw += 2.0f * elapsedTime / moveScale;
             }
         });
 
@@ -119,16 +121,10 @@ public class Main {
 //        meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         try {
-            sprTex1 = ImageIO.read(new File("ducky.jpg"));
+            sprTex1 = ImageIO.read(new File("rainbow.png"));
         } catch (IOException e) {
             System.out.println("brush");
         }
-
-        int color = sprTex1.getRGB(0, 0);
-        Color color2 = new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff);
-        System.out.println(color2);
-
-        // meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         running = true;
         while (running) {
@@ -329,14 +325,11 @@ public class Main {
 //                        g2d.setColor(t.col);
 //                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
-//                        Util.TexturedTriangle(t.p[0].x, t.p[0].y, t.t[0].u, t.t[0].v,
-//                                t.p[1].x, t.p[1].y, t.t[1].u, t.t[1].v,
-//                                t.p[2].x, t.p[2].y, t.t[2].u, t.t[2].v, g2d, sprTex1);
-                        Util.TexturedTriangle(new ArrayList<Integer>(Arrays.asList(t.p[0].x, t.p[1].x, t.p[2].x)),
-                                new ArrayList<Integer>(Arrays.asList(t.p[0].y, t.p[1].y, t.p[2].y)),
-                                new ArrayList<Float>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
-                                new ArrayList<Float>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
-                                g2d, sprTex1);
+                        Util.TexturedTriangle(new ArrayList<>(Arrays.asList((int)t.p[0].x, (int)t.p[1].x, (int)t.p[2].x)),
+                                            new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
+                                            new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
+                                            new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
+                                            g2d, sprTex1);
 
                         g2d.setColor(Color.WHITE);
                         g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);

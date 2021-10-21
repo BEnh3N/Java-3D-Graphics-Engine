@@ -398,8 +398,9 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    System.out.println(texU + ", " + texV);
-                    int color = tex.getRGB((int) texU, (int) texV);
+                    int texX = (tex.getWidth() - 1) - (int) (texU * (tex.getWidth() - 1));
+                    int texY = (int) (texV * (tex.getHeight() - 1));
+                    int color = tex.getRGB(texX, texY);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
 
@@ -447,7 +448,9 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    int color = tex.getRGB((int)texU, (int)texV);
+                    int texX = (tex.getWidth() - 1) - (int) (texU * (tex.getWidth() - 1));
+                    int texY = (int) (texV * (tex.getHeight() - 1));
+                    int color = tex.getRGB(texX, texY);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
 
