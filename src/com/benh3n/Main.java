@@ -116,6 +116,8 @@ public class Main {
                 new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
         ));
 
+//        meshCube = mesh.loadObjectFromFile("mountains.obj");
+
         try {
             sprTex1 = ImageIO.read(new File("ducky.jpg"));
         } catch (IOException e) {
@@ -327,9 +329,14 @@ public class Main {
 //                        g2d.setColor(t.col);
 //                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
-                        Util.TexturedTriangle(t.p[0].x, t.p[0].y, t.t[0].u, t.t[0].v,
-                                t.p[1].x, t.p[1].y, t.t[1].u, t.t[1].v,
-                                t.p[2].x, t.p[2].y, t.t[2].u, t.t[2].v, g2d, sprTex1);
+//                        Util.TexturedTriangle(t.p[0].x, t.p[0].y, t.t[0].u, t.t[0].v,
+//                                t.p[1].x, t.p[1].y, t.t[1].u, t.t[1].v,
+//                                t.p[2].x, t.p[2].y, t.t[2].u, t.t[2].v, g2d, sprTex1);
+                        Util.TexturedTriangle(new ArrayList<Integer>(Arrays.asList(t.p[0].x, t.p[1].x, t.p[2].x)),
+                                new ArrayList<Integer>(Arrays.asList(t.p[0].y, t.p[1].y, t.p[2].y)),
+                                new ArrayList<Float>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
+                                new ArrayList<Float>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
+                                g2d, sprTex1);
 
                         g2d.setColor(Color.WHITE);
                         g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);

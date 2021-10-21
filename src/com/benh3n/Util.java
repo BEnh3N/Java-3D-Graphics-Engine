@@ -2,8 +2,11 @@ package com.benh3n;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import com.benh3n.Structs.*;
 
@@ -310,42 +313,42 @@ public final class Util {
         return new Color(col, col, col);
     }
 
-    private static Object[] swap(Object o1, Object o2) {
-        return new Object[]{o2, o1};
-    }
-    public static void TexturedTriangle(float x1, float y1, float u1, float v1,
-                                        float x2, float y2, float u2, float v2,
-                                        float x3, float y3, float u3, float v3,
+//    public static void TexturedTriangle(float x1, float y1, float u1, float v1,
+//                                        float x2, float y2, float u2, float v2,
+//                                        float x3, float y3, float u3, float v3,
+//                                        Graphics2D g2d, BufferedImage tex) {
+    public static void TexturedTriangle(ArrayList<Integer> x, ArrayList<Integer> y, ArrayList<Float> u, ArrayList<Float> v,
                                         Graphics2D g2d, BufferedImage tex) {
 
-        if (y2 < y1) {
-            var temp1 = y1; y1 = y2; y2 = temp1;
-            var temp2 = x1; x1 = x2; x2 = temp2;
-            var temp3 = u1; u1 = u2; u2 = temp3;
-            var temp4 = v1; v1 = v2; v2 = temp4;
+        if (y.get(1) < y.get(0)) {
+            Collections.swap(y, 0, 1);
+            Collections.swap(x, 0, 1);
+            Collections.swap(u, 0, 1);
+            Collections.swap(v, 0, 1);
         }
-        if (y3 < y1) {
-            var temp1 = y1; y1 = y3; y3 = temp1;
-            var temp2 = x1; x1 = x3; x3 = temp2;
-            var temp3 = u1; u1 = u3; u3 = temp3;
-            var temp4 = v1; v1 = v3; v3 = temp4;
+        if (y.get(2) < y.get(0)) {
+            Collections.swap(y, 0, 2);
+            Collections.swap(x, 0, 2);
+            Collections.swap(u, 0, 2);
+            Collections.swap(v, 0, 2);
         }
-        if (y3 < y2) {
-            var temp1 = y2; y2 = y3; y3 = temp1;
-            var temp2 = x2; x2 = x3; x3 = temp2;
-            var temp3 = u2; u2 = u3; u3 = temp3;
-            var temp4 = v2; v2 = v3; v3 = temp4;
+        if (y.get(2) < y.get(1)) {
+            Collections.swap(y, 1, 2);
+            Collections.swap(x, 1, 2);
+            Collections.swap(u, 1, 2);
+            Collections.swap(v, 1, 2);
         }
 
-        int dy1 = (int) (y2 - y1);
-        int dx1 = (int) (x2 - x1);
-        float dv1 = v2 - v1;
-        float du1 = u2 - u1;
 
-        int dy2 = (int) (y3 - y1);
-        int dx2 = (int) (x3 - x1);
-        float dv2 = v3 - v1;
-        float du2 = u3 - u1;
+        int dy1 = y.get(1) - y.get(0);
+        int dx1 = x.get(1) - x.get(0);
+        float dv1 = v.get(1) - v.get(0);
+        float du1 = u.get(1) - u.get(0);
+
+        int dy2 = y.get(2) - y.get(0);
+        int dx2 = x.get(2) - x.get(0);
+        float dv2 = v.get(2) - v.get(0);
+        float du2 = u.get(2) - u.get(0);
 
         float texU, texV;
 
@@ -363,20 +366,76 @@ public final class Util {
         if (dy2 != 0) dv2Step = dv2 / (float)Math.abs(dy2);
 
         if (dy1 != 0) {
-            for (int i = (int) y1; i <= y2; i++) {
-                int ax = (int) (x1 + (i - y1) * daxStep);
-                int bx = (int) (x1 + (i - y1) * dbxStep);
+            for (int i = y.get(0); i <= y.get(1); i++) {
 
-                float texSu = u1 + (i - y1) * du1Step;
-                float texSv = v1 + (i - y1) * dv1Step;
+                int ax = (int) (x.get(0) + (i - y.get(0)) * daxStep);
+                int bx = (int) (x.get(0) + (i - y.get(0)) * dbxStep);
 
-                float texEu = u1 + (i - y1) * du2Step;
-                float texEv = v1 + (i - y1) * dv2Step;
+                float texSu = u.get(0) + (i - y.get(0)) * du1Step;
+                float texSv = v.get(0) + (i - y.get(0)) * dv1Step;
+
+                float texEu = u.get(0) + (i - y.get(0)) * du2Step;
+                float texEv = v.get(0) + (i - y.get(0)) * dv2Step;
 
                 if (ax > bx) {
-                    var temp1 = ax; ax = bx; bx = temp1;
-                    var temp2 = texSu; texSu = texEu; texEu = temp2;
-                    var temp3 = texSv; texSv = texEv; texEv = temp3;
+                    int temp1 = ax;
+                    ax = bx;
+                    bx = temp1;
+                    float temp2 = texSu;
+                    texSu = texEu;
+                    texEu = temp2;
+                    float temp3 = texSv;
+                    texSv = texEv;
+                    texEv = temp3;
+                }
+
+                texU = texSu;
+                texV = texSv;
+
+                float tStep = 1.0f / ((float) (bx - ax));
+                float t = 0.0f;
+
+                for (int j = ax; j < bx; j++) {
+                    texU = (1.0f - t) * texSu + t * texEu;
+                    texV = (1.0f - t) * texSv + t * texEv;
+                    System.out.println(texU + ", " + texV);
+                    int color = tex.getRGB((int) texU, (int) texV);
+                    g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
+                    g2d.drawLine(j, i, j, i);
+
+                    t += tStep;
+                }
+            }
+
+        }
+
+        dy1 = y.get(2) - y.get(1);
+        dx1 = x.get(2) - x.get(1);
+        dv1 = v.get(2) - v.get(1);
+        du1 = u.get(2) - u.get(1);
+
+        if (dy1 != 0) daxStep = dx1 / (float)Math.abs(dy1);
+        if (dy2 != 0) dbxStep = dx2 / (float)Math.abs(dy2);
+
+        du1Step = 0; dv1Step = 0;
+        if (dy1 != 0) du1Step = du1 / (float)Math.abs(dy1);
+        if (dy1 != 0) dv1Step = dv1 / (float)Math.abs(dy1);
+
+        if (dy1 != 0) {
+            for (int i = y.get(1); i <= y.get(2); i++) {
+                int ax = (int) (x.get(1) + (i - y.get(1)) * daxStep);
+                int bx = (int) (x.get(0) + (i - y.get(0)) * dbxStep);
+
+                float texSu = u.get(1) + (i - y.get(1)) * du1Step;
+                float texSv = v.get(1) + (i - y.get(1)) * dv1Step;
+
+                float texEu = u.get(0) + (i - y.get(0)) * du2Step;
+                float texEv = v.get(0) + (i - y.get(0)) * dv2Step;
+
+                if (ax > bx) {
+                    int temp1 = ax; ax = bx; bx = temp1;
+                    float temp2 = texSu; texSu = texEu; texEu = temp2;
+                    float temp3 = texSv; texSv = texEv; texEv = temp3;
                 }
 
                 texU = texSu;
@@ -388,59 +447,11 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    System.out.println(texV);
-                    System.out.println((int)(texV * 100));
                     int color = tex.getRGB((int)texU, (int)texV);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
 
                     t += tStep;
-
-                }
-            }
-
-            dy1 = (int) (y3 - y2);
-            dx1 = (int) (x3 - x2);
-            dv1 = v3 - v2;
-            du1 = u3 - u2;
-            if (dy1 != 0) daxStep = dx1 / (float)Math.abs(dy1);
-            if (dy2 != 0) dbxStep = dx2 / (float)Math.abs(dy2);
-
-            du1Step = 0; dv1Step = 0;
-            if (dy1 != 0) du1Step = du1 / (float)Math.abs(dy1);
-            if (dy1 != 0) dv1Step = dv1 / (float)Math.abs(dy1);
-
-            for (int i = (int) y2; i <= y3; i++) {
-                int ax = (int) (x2 + (i - y2) * daxStep);
-                int bx = (int) (x1 + (i - y1) * dbxStep);
-
-                float texSu = u2 + (i - y2) * du1Step;
-                float texSv = v2 + (i - y2) * dv1Step;
-
-                float texEu = u1 + (i - y1) * du2Step;
-                float texEv = v1 + (i - y1) * dv2Step;
-
-                if (ax > bx) {
-                    var temp1 = ax; ax = bx; bx = temp1;
-                    var temp2 = texSu; texSu = texEu; texEu = temp2;
-                    var temp3 = texSv; texSv = texEv; texEv = temp3;
-                }
-
-                texU = texSu;
-                texV = texSv;
-
-                float tStep = 1.0f / ((float)(bx - ax));
-                float t = 0.0f;
-
-                for (int j = ax; j < bx; j++) {
-                    texU = (1.0f - t) * texSu + t * texEu;
-                    texV = (1.0f - t) * texSv + t * texEv;
-                    int color = tex.getRGB(0, 0);
-                    g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
-                    g2d.drawLine(j, i, j, i);
-
-                    t += tStep;
-
                 }
             }
         }
