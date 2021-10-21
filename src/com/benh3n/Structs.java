@@ -65,8 +65,8 @@ public class Structs {
     }
 
     public static class triangle implements Cloneable {
-        vec3D[] p = new vec3D[3];
-        vec2D[] t = new vec2D[3];
+        vec3D[] p = new vec3D[]{new vec3D(), new vec3D(), new vec3D()};
+        vec2D[] t = new vec2D[]{new vec2D(), new vec2D(), new vec2D()};
         Color col;
         public triangle(){
         }

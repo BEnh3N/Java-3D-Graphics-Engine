@@ -192,8 +192,10 @@ public final class Util {
         // If distance sign is positive, point lies on "inside" of plane
         vec3D[] insidePoints  = new vec3D[3]; int nInsidePointCount  = 0;
         vec3D[] outsidePoints = new vec3D[3]; int nOutsidePointCount = 0;
-        vec2D[] insideTex  = new vec2D[3];    int nInsideTexCount  = 0;
-        vec2D[] outsideTex = new vec2D[3];    int nOutsideTexCount = 0;
+        vec2D[] insideTex  = new vec2D[3];
+        vec2D[] outsideTex = new vec2D[3];
+
+
 
         // Get signed distance of each point in triangle to plane
         float d0 = d.dist(inTri.p[0]);
@@ -201,22 +203,22 @@ public final class Util {
         float d2 = d.dist(inTri.p[2]);
 
         if (d0 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p[0]; insideTex[nInsideTexCount++] = inTri.t[0];
+            insidePoints[nInsidePointCount] = inTri.p[0]; insideTex[nInsidePointCount++] = inTri.t[0];
         }
         else {
-            outsidePoints[nOutsidePointCount++] = inTri.p[0]; outsideTex[nOutsideTexCount++] = inTri.t[0];
+            outsidePoints[nOutsidePointCount] = inTri.p[0]; outsideTex[nOutsidePointCount++] = inTri.t[0];
         }
         if (d1 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p[1]; insideTex[nInsideTexCount++] = inTri.t[1];
+            insidePoints[nInsidePointCount] = inTri.p[1]; insideTex[nInsidePointCount++] = inTri.t[1];
         }
         else {
-            outsidePoints[nOutsidePointCount++] = inTri.p[1]; outsideTex[nOutsideTexCount++] = inTri.t[1];
+            outsidePoints[nOutsidePointCount] = inTri.p[1]; outsideTex[nOutsidePointCount++] = inTri.t[1];
         }
         if (d2 >= 0) {
-            insidePoints[nInsidePointCount++] = inTri.p[2]; insideTex[nInsideTexCount++] = inTri.t[2];
+            insidePoints[nInsidePointCount] = inTri.p[2]; insideTex[nInsidePointCount++] = inTri.t[2];
         }
         else {
-            outsidePoints[nOutsidePointCount++] = inTri.p[2]; outsideTex[nOutsideTexCount++] = inTri.t[2];
+            outsidePoints[nOutsidePointCount] = inTri.p[2]; outsideTex[nOutsidePointCount++] = inTri.t[2];
         }
 
         // Now classify triangle points, and break the input triangle into
@@ -234,7 +236,7 @@ public final class Util {
             // and allow the triangle to simply pass through
             outTri1 = inTri;
 
-            return new returnClip(1, new triangle[]{outTri1, null}); // Just the one returned original triangle is valid
+            return new returnClip(1, new triangle[]{outTri1.clone(), null}); // Just the one returned original triangle is valid
 
         } else if (nOutsidePointCount == 2) {
             // Triangle should be clipped. As two points lie outside
@@ -246,20 +248,20 @@ public final class Util {
 
             // The inside point is valid, so keep that...
             outTri1.p[0] = insidePoints[0];
-//            outTri1.t[0] = insideTex[0];
+            outTri1.t[0] = insideTex[0];
 
             // but the two new points are at the locations where the
             // original sides of the triangle (lines) intersect with the plane
             float[] t = {0};
             outTri1.p[1] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
-//            outTri1.t[1].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
-//            outTri1.t[1].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
+            outTri1.t[1].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
+            outTri1.t[1].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
 
             outTri1.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[1], t);
-//            outTri1.t[2].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
-//            outTri1.t[2].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
+            outTri1.t[2].u = t[0] * (outsideTex[1].u - insideTex[0].u) + insideTex[0].u;
+            outTri1.t[2].v = t[0] * (outsideTex[1].v - insideTex[0].v) + insideTex[0].v;
 
-            return new returnClip(1, new triangle[]{outTri1, null}); // Return the newly formed single triangle
+            return new returnClip(1, new triangle[]{outTri1.clone(), null}); // Return the newly formed single triangle
 
         } else {
             // Triangle should be clipped. As two points lie inside the plane,
@@ -277,18 +279,24 @@ public final class Util {
             // intersects with the plane
             outTri1.p[0] = insidePoints[0];
             outTri1.p[1] = insidePoints[1];
-//            outTri1.t[0] = insideTex[0];
-//            outTri1.t[1] = insideTex[1];
+            outTri1.t[0] = insideTex[0];
+            outTri1.t[1] = insideTex[1];
 
             float[] t = {0};
             outTri1.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
+            outTri1.t[2].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
+            outTri1.t[2].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
 
             // The second triangle is composed of one of the inside points, a
             // new point determined by the intersection of the other side of the
             // triangle and the plane, and the newly created point above
             outTri2.p[0] = insidePoints[1];
+            outTri2.t[0] = insideTex[1];
             outTri2.p[1] = outTri1.p[2];
+            outTri2.t[1] = outTri1.t[2];
             outTri2.p[2] = VectorIntersectPlane(planeP, planeN, insidePoints[1], outsidePoints[0], t);
+            outTri2.t[2].u = t[0] * (outsideTex[0].u - insideTex[1].u) + insideTex[1].u;
+            outTri2.t[2].v = t[0] * (outsideTex[0].v - insideTex[1].v) + insideTex[1].v;
 
             return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }

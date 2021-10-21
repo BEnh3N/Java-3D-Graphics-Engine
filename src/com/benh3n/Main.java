@@ -166,7 +166,9 @@ public class Main {
                     triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
                     triTransformed.p[1] = Util.MatrixMultiplyVector(matWorld, tri.p[1]);
                     triTransformed.p[2] = Util.MatrixMultiplyVector(matWorld, tri.p[2]);
-                    triTransformed.t = tri.t.clone();
+                    triTransformed.t[0] = tri.t[0];
+                    triTransformed.t[1] = tri.t[1];
+                    triTransformed.t[2] = tri.t[2];
 
                     // Calculate Triangle Normal
                     vec3D normal, line1, line2;
@@ -201,7 +203,9 @@ public class Main {
                         triViewed.p[1] = Util.MatrixMultiplyVector(matView, triTransformed.p[1]);
                         triViewed.p[2] = Util.MatrixMultiplyVector(matView, triTransformed.p[2]);
                         triViewed.col = triTransformed.col;
-                        triViewed.t = triTransformed.t.clone();
+                        triViewed.t[0] = triTransformed.t[0];
+                        triViewed.t[1] = triTransformed.t[1];
+                        triViewed.t[2] = triTransformed.t[2];
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
@@ -216,7 +220,9 @@ public class Main {
                             triProjected.p[1] = Util.MatrixMultiplyVector(matProj, clipped[n].p[1]);
                             triProjected.p[2] = Util.MatrixMultiplyVector(matProj, clipped[n].p[2]);
                             triProjected.col = clipped[n].col;
-                            triProjected.t = clipped[n].t.clone();
+                            triProjected.t[0] = clipped[n].t[0];
+                            triProjected.t[1] = clipped[n].t[1];
+                            triProjected.t[2] = clipped[n].t[2];
 
                             // Scale into view, we moved the normalising into cartesian space
                             // out of the matrix.vector function from the previous video, so
