@@ -1,6 +1,7 @@
 package com.benh3n;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -315,7 +316,7 @@ public final class Util {
     public static void TexturedTriangle(float x1, float y1, float u1, float v1,
                                         float x2, float y2, float u2, float v2,
                                         float x3, float y3, float u3, float v3,
-                                        Graphics2D g2d, Color col) {
+                                        Graphics2D g2d, BufferedImage tex) {
 
         if (y2 < y1) {
             var temp1 = y1; y1 = y2; y2 = temp1;
@@ -387,7 +388,18 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    g2d.setColor(col);
+                    System.out.println(texU + ", " + texV);
+                    int texX = (int) (texU * tex.getWidth() - 1);
+                    int texY = (int) (Math.abs(texV) * tex.getHeight() - 1);
+                    if (texX >= 144) {
+                        texX = 143;
+                    }
+                    if (texY >= 144) {
+                        texY = 143;
+                    }
+                    System.out.println(texX + ", " + texY);
+                    int color = tex.getRGB(texX, texY);
+                    g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
 
                     t += tStep;
@@ -431,7 +443,16 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    g2d.setColor(col);
+                    int texX = (int) (texU * tex.getWidth() - 1);
+                    int texY = (int) (Math.abs(texV) * tex.getHeight() - 1);
+                    if (texX >= 144) {
+                        texX = 143;
+                    }
+                    if (texY >= 144) {
+                        texY = 143;
+                    }
+                    int color = tex.getRGB(texX, texY);
+                    g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
 
                     t += tStep;

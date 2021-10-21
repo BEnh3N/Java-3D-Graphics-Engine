@@ -20,13 +20,13 @@ public class Main {
 
     static mesh meshCube = new mesh();
     static mat4x4 matProj = new mat4x4();
-
     static vec3D vCamera = new vec3D();
     static vec3D vLookDir;
-
     static float fYaw;
-
     static float fTheta;
+
+    static BufferedImage sprTex1;
+
     static long elapsedTime;
 
     static boolean running;
@@ -116,7 +116,17 @@ public class Main {
                 new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
         ));
 
-         meshCube = mesh.loadObjectFromFile("mountains.obj");
+        try {
+            sprTex1 = ImageIO.read(new File("ducky.jpg"));
+        } catch (IOException e) {
+            System.out.println("brush");
+        }
+
+        int color = sprTex1.getRGB(0, 0);
+        Color color2 = new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff);
+        System.out.println(color2);
+
+        // meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         running = true;
         while (running) {
@@ -319,10 +329,10 @@ public class Main {
 
                         Util.TexturedTriangle(t.p[0].x, t.p[0].y, t.t[0].u, t.t[0].v,
                                 t.p[1].x, t.p[1].y, t.t[1].u, t.t[1].v,
-                                t.p[2].x, t.p[2].y, t.t[2].u, t.t[2].v, g2d, t.col);
+                                t.p[2].x, t.p[2].y, t.t[2].u, t.t[2].v, g2d, sprTex1);
 
-//                        g2d.setColor(Color.WHITE);
-//                        g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
+                        g2d.setColor(Color.WHITE);
+                        g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
                     }
                 }
 
