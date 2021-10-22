@@ -2,11 +2,8 @@ package com.benh3n;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import com.benh3n.Structs.*;
 
@@ -313,11 +310,7 @@ public final class Util {
         return new Color(col, col, col);
     }
 
-//    public static void TexturedTriangle(float x1, float y1, float u1, float v1,
-//                                        float x2, float y2, float u2, float v2,
-//                                        float x3, float y3, float u3, float v3,
-//                                        Graphics2D g2d, BufferedImage tex) {
-    public static void TexturedTriangle(ArrayList<Integer> x, ArrayList<Integer> y, ArrayList<Float> u, ArrayList<Float> v,
+    public static void TexturedTriangle(ArrayList<Integer> x, ArrayList<Integer> y, ArrayList<Float> u, ArrayList<Float> v, ArrayList<Float> w,
                                         Graphics2D g2d, BufferedImage tex) {
 
         if (y.get(1) < y.get(0)) {
@@ -325,18 +318,21 @@ public final class Util {
             Collections.swap(x, 0, 1);
             Collections.swap(u, 0, 1);
             Collections.swap(v, 0, 1);
+            Collections.swap(w, 0, 1);
         }
         if (y.get(2) < y.get(0)) {
             Collections.swap(y, 0, 2);
             Collections.swap(x, 0, 2);
             Collections.swap(u, 0, 2);
             Collections.swap(v, 0, 2);
+            Collections.swap(w, 0, 2);
         }
         if (y.get(2) < y.get(1)) {
             Collections.swap(y, 1, 2);
             Collections.swap(x, 1, 2);
             Collections.swap(u, 1, 2);
             Collections.swap(v, 1, 2);
+            Collections.swap(w, 1, 2);
         }
 
 
@@ -344,26 +340,31 @@ public final class Util {
         int dx1 = x.get(1) - x.get(0);
         float dv1 = v.get(1) - v.get(0);
         float du1 = u.get(1) - u.get(0);
+        float dw1 = w.get(1) - w.get(0);
 
         int dy2 = y.get(2) - y.get(0);
         int dx2 = x.get(2) - x.get(0);
         float dv2 = v.get(2) - v.get(0);
         float du2 = u.get(2) - u.get(0);
+        float dw2 = w.get(2) - w.get(0);
 
-        float texU, texV;
+        float texU, texV, texW;
 
         float daxStep = 0, dbxStep = 0,
                 du1Step = 0, dv1Step = 0,
-                du2Step = 0, dv2Step = 0;
+                du2Step = 0, dv2Step = 0,
+                dw1Step = 0, dw2Step = 0;
 
         if (dy1 != 0) daxStep = dx1 / (float)Math.abs(dy1);
         if (dy2 != 0) dbxStep = dx2 / (float)Math.abs(dy2);
 
         if (dy1 != 0) du1Step = du1 / (float)Math.abs(dy1);
         if (dy1 != 0) dv1Step = dv1 / (float)Math.abs(dy1);
+        if (dy1 != 0) dw1Step = dw1 / (float)Math.abs(dy1);
 
         if (dy2 != 0) du2Step = du2 / (float)Math.abs(dy2);
         if (dy2 != 0) dv2Step = dv2 / (float)Math.abs(dy2);
+        if (dy2 != 0) dw2Step = dw2 / (float)Math.abs(dy2);
 
         if (dy1 != 0) {
             for (int i = y.get(0); i <= y.get(1); i++) {
@@ -373,24 +374,22 @@ public final class Util {
 
                 float texSu = u.get(0) + (i - y.get(0)) * du1Step;
                 float texSv = v.get(0) + (i - y.get(0)) * dv1Step;
+                float texSw = w.get(0) + (i - y.get(0)) * dw1Step;
 
                 float texEu = u.get(0) + (i - y.get(0)) * du2Step;
                 float texEv = v.get(0) + (i - y.get(0)) * dv2Step;
+                float texEw = w.get(0) + (i - y.get(0)) * dw2Step;
 
                 if (ax > bx) {
-                    int temp1 = ax;
-                    ax = bx;
-                    bx = temp1;
-                    float temp2 = texSu;
-                    texSu = texEu;
-                    texEu = temp2;
-                    float temp3 = texSv;
-                    texSv = texEv;
-                    texEv = temp3;
+                    int temp1 = ax; ax = bx; bx = temp1;
+                    float temp2 = texSu; texSu = texEu; texEu = temp2;
+                    float temp3 = texSv; texSv = texEv; texEv = temp3;
+                    float temp4 = texSw; texSw = texEw; texEw = temp4;
                 }
 
                 texU = texSu;
                 texV = texSv;
+                texW = texSw;
 
                 float tStep = 1.0f / ((float) (bx - ax));
                 float t = 0.0f;
@@ -398,8 +397,11 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    int texX = (tex.getWidth() - 1) - (int) (texU * (tex.getWidth() - 1));
-                    int texY = (int) (texV * (tex.getHeight() - 1));
+                    texW = (1.0f - t) * texSw + t * texEw;
+//                    System.out.println(texU + " " + texV + " " + texW);
+                    int texX = (tex.getWidth() - 1) - (int) ((texU) * (tex.getWidth() - 1));
+                    int texY = (int) ((texV) * (tex.getHeight() - 1));
+//                    System.out.println(texX + " " + texY);
                     int color = tex.getRGB(texX, texY);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
@@ -414,6 +416,7 @@ public final class Util {
         dx1 = x.get(2) - x.get(1);
         dv1 = v.get(2) - v.get(1);
         du1 = u.get(2) - u.get(1);
+        dw1 = w.get(2) - w.get(1);
 
         if (dy1 != 0) daxStep = dx1 / (float)Math.abs(dy1);
         if (dy2 != 0) dbxStep = dx2 / (float)Math.abs(dy2);
@@ -421,6 +424,7 @@ public final class Util {
         du1Step = 0; dv1Step = 0;
         if (dy1 != 0) du1Step = du1 / (float)Math.abs(dy1);
         if (dy1 != 0) dv1Step = dv1 / (float)Math.abs(dy1);
+        if (dy1 != 0) dw1Step = dw1 / (float)Math.abs(dy1);
 
         if (dy1 != 0) {
             for (int i = y.get(1); i <= y.get(2); i++) {
@@ -429,18 +433,22 @@ public final class Util {
 
                 float texSu = u.get(1) + (i - y.get(1)) * du1Step;
                 float texSv = v.get(1) + (i - y.get(1)) * dv1Step;
+                float texSw = w.get(1) + (i - y.get(1)) * dw1Step;
 
                 float texEu = u.get(0) + (i - y.get(0)) * du2Step;
                 float texEv = v.get(0) + (i - y.get(0)) * dv2Step;
+                float texEw = w.get(0) + (i - y.get(0)) * dw2Step;
 
                 if (ax > bx) {
                     int temp1 = ax; ax = bx; bx = temp1;
                     float temp2 = texSu; texSu = texEu; texEu = temp2;
                     float temp3 = texSv; texSv = texEv; texEv = temp3;
+                    float temp4 = texSw; texSw = texEw; texEw = temp4;
                 }
 
                 texU = texSu;
                 texV = texSv;
+                texW = texSw;
 
                 float tStep = 1.0f / ((float)(bx - ax));
                 float t = 0.0f;
@@ -448,8 +456,9 @@ public final class Util {
                 for (int j = ax; j < bx; j++) {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
-                    int texX = (tex.getWidth() - 1) - (int) (texU * (tex.getWidth() - 1));
-                    int texY = (int) (texV * (tex.getHeight() - 1));
+                    texW = (1.0f - t) * texSw + t * texEw;
+                    int texX = (tex.getWidth() - 1) - (int) ((texU) * (tex.getWidth() - 1));
+                    int texY = (int) ((texV) * (tex.getHeight() - 1));
                     int color = tex.getRGB(texX, texY);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);

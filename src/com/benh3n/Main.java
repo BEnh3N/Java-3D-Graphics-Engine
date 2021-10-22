@@ -27,7 +27,7 @@ public class Main {
 
     static BufferedImage sprTex1;
 
-    static long elapsedTime;
+    static float elapsedTime;
 
     static boolean running;
 
@@ -41,22 +41,20 @@ public class Main {
         frame.setIgnoreRepaint(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        int moveScale = 50000000;
-
         frame.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     running = false;
                 if (e.getKeyCode() == KeyEvent.VK_SPACE)
-                    vCamera.y += 8.0f * elapsedTime / moveScale;
+                    vCamera.y += 8.0f * elapsedTime;
                 if (e.getKeyCode() == KeyEvent.VK_SHIFT)
-                    vCamera.y -= 8.0f * elapsedTime / moveScale;
+                    vCamera.y -= 8.0f * elapsedTime;
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-                    vCamera.x -= 8.0f * elapsedTime / moveScale;
+                    vCamera.x -= 8.0f * elapsedTime;
                 if (e.getKeyCode() == KeyEvent.VK_LEFT)
-                    vCamera.x += 8.0f * elapsedTime / moveScale;
+                    vCamera.x += 8.0f * elapsedTime;
 
-                vec3D vForward = Util.VectorMul(vLookDir, 8.0f * elapsedTime / moveScale);
+                vec3D vForward = Util.VectorMul(vLookDir, 8.0f * elapsedTime);
 
                 if (e.getKeyCode() == KeyEvent.VK_W)
                     vCamera = Util.VectorAdd(vCamera, vForward);
@@ -64,9 +62,9 @@ public class Main {
                     vCamera = Util.VectorSub(vCamera, vForward);
 
                 if (e.getKeyCode() == KeyEvent.VK_A)
-                    fYaw -= 2.0f * elapsedTime / moveScale;
+                    fYaw -= 2.0f * elapsedTime;
                 if (e.getKeyCode() == KeyEvent.VK_D)
-                    fYaw += 2.0f * elapsedTime / moveScale;
+                    fYaw += 2.0f * elapsedTime;
             }
         });
 
@@ -142,7 +140,7 @@ public class Main {
 
                 // Set up Rotation Matrices
                 mat4x4 matRotZ, matRotX;
-
+                fTheta += 0.15 * elapsedTime; // Uncomment to spin me right round baby
                 matRotZ = Util.MatrixMakeRotationZ(fTheta * 0.5f);
                 matRotX = Util.MatrixMakeRotationX(fTheta);
 
@@ -175,9 +173,7 @@ public class Main {
                     triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
                     triTransformed.p[1] = Util.MatrixMultiplyVector(matWorld, tri.p[1]);
                     triTransformed.p[2] = Util.MatrixMultiplyVector(matWorld, tri.p[2]);
-                    triTransformed.t[0] = tri.t[0];
-                    triTransformed.t[1] = tri.t[1];
-                    triTransformed.t[2] = tri.t[2];
+                    triTransformed.t = tri.t;
 
                     // Calculate Triangle Normal
                     vec3D normal, line1, line2;
@@ -212,9 +208,7 @@ public class Main {
                         triViewed.p[1] = Util.MatrixMultiplyVector(matView, triTransformed.p[1]);
                         triViewed.p[2] = Util.MatrixMultiplyVector(matView, triTransformed.p[2]);
                         triViewed.col = triTransformed.col;
-                        triViewed.t[0] = triTransformed.t[0];
-                        triViewed.t[1] = triTransformed.t[1];
-                        triViewed.t[2] = triTransformed.t[2];
+                        triViewed.t = triTransformed.t;
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
@@ -229,9 +223,19 @@ public class Main {
                             triProjected.p[1] = Util.MatrixMultiplyVector(matProj, clipped[n].p[1]);
                             triProjected.p[2] = Util.MatrixMultiplyVector(matProj, clipped[n].p[2]);
                             triProjected.col = clipped[n].col;
-                            triProjected.t[0] = clipped[n].t[0];
-                            triProjected.t[1] = clipped[n].t[1];
-                            triProjected.t[2] = clipped[n].t[2];
+                            triProjected.t = clipped[n].t;
+
+//                            triProjected.t[0].u /= triProjected.p[0].w;
+//                            triProjected.t[1].u /= triProjected.p[1].w;
+//                            triProjected.t[2].u /= triProjected.p[2].w;
+//
+//                            triProjected.t[0].v = triProjected.t[0].v / triProjected.p[0].w;
+//                            triProjected.t[1].v = triProjected.t[1].v / triProjected.p[1].w;
+//                            triProjected.t[2].v = triProjected.t[2].v / triProjected.p[2].w;
+//
+//                            triProjected.t[0].w = 1.0f / triProjected.p[0].w;
+//                            triProjected.t[1].w = 1.0f / triProjected.p[1].w;
+//                            triProjected.t[2].w = 1.0f / triProjected.p[2].w;
 
                             // Scale into view, we moved the normalising into cartesian space
                             // out of the matrix.vector function from the previous video, so
@@ -329,6 +333,7 @@ public class Main {
                                             new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
                                             new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
                                             new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
+                                            new ArrayList<>(Arrays.asList(t.t[0].w, t.t[1].w, t.t[2].w)),
                                             g2d, sprTex1);
 
                         g2d.setColor(Color.WHITE);
@@ -343,7 +348,7 @@ public class Main {
 
                 bi = gc.createCompatibleImage(canvas.getWidth(), canvas.getHeight());
                 long end = System.nanoTime();
-                elapsedTime = end - now;
+                elapsedTime = (end - now) / 100000000.0f;
 
                 // fTheta += elapsedTime / 1000000000.0;
 

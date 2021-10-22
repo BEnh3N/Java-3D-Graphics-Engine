@@ -10,6 +10,7 @@ public class Structs {
     public static class vec2D implements Cloneable{
         float u = 0.0f;
         float v = 0.0f;
+        float w = 1.0f;
         public vec2D() {
 
         }
@@ -23,6 +24,7 @@ public class Structs {
                 vec2D clone = (vec2D) super.clone();
                 clone.u = this.u;
                 clone.v = this.v;
+                clone.w = this.w;
                 return clone;
             } catch (CloneNotSupportedException e) {
                 throw new AssertionError();
@@ -30,7 +32,7 @@ public class Structs {
         }
         @Override
         public String toString() {
-            return "(" + u + ", " + v + ")";
+            return "(" + this.u + ", " + this.v + ") " + this.w;
         }
     }
 
@@ -60,7 +62,7 @@ public class Structs {
         }
         @Override
         public String toString() {
-            return "(" + x + ", " + y + ", " + z + ")";
+            return "(" + this.x + ", " + this.y + ", " + this.z + ") " + this.w;
         }
     }
 
