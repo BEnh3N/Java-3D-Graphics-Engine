@@ -117,8 +117,6 @@ public class Main {
                 new Triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
         ));
 
-        meshCube = Mesh.loadObjectFromFile("axis.obj");
-
         try {
             sprTex1 = ImageIO.read(new File("rainbow.png"));
         } catch (IOException e) { System.out.println("brush"); }
@@ -139,7 +137,7 @@ public class Main {
 
                 // Set up Rotation Matrices
                 mat4x4 matRotZ, matRotX;
-//                fTheta += 0.15 * elapsedTime; // Uncomment to spin me right round baby
+                fTheta += 0.15 * elapsedTime; // Uncomment to spin me right round baby
                 matRotZ = Util.MatrixMakeRotationZ(fTheta * 0.5f);
                 matRotX = Util.MatrixMakeRotationX(fTheta);
 
@@ -167,12 +165,13 @@ public class Main {
 
                 // Draw Triangles
                 for (Triangle tri : meshCube.tris) {
+                    System.out.println(meshCube.tris);
                     Triangle triProjected = new Triangle(), triTransformed = new Triangle(), triViewed = new Triangle();
 
                     triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
                     triTransformed.p[1] = Util.MatrixMultiplyVector(matWorld, tri.p[1]);
                     triTransformed.p[2] = Util.MatrixMultiplyVector(matWorld, tri.p[2]);
-                    triTransformed.t = tri.t;
+                    triTransformed.t = tri.clone().t;
 
                     // Calculate Triangle Normal
                     Vec3D normal, line1, line2;
@@ -207,16 +206,13 @@ public class Main {
                         triViewed.p[1] = Util.MatrixMultiplyVector(matView, triTransformed.p[1]);
                         triViewed.p[2] = Util.MatrixMultiplyVector(matView, triTransformed.p[2]);
                         triViewed.col = triTransformed.col;
-                        triViewed.t = triTransformed.t;
+                        triViewed.t = triTransformed.t.clone();
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
                         returnClip clipResult = Util.TriangleClipAgainstPlane(new Vec3D(0.0f, 0.0f, 0.1f), new Vec3D(0.0f, 0.0f, 1.0f), triViewed);
                         int nClippedTriangles = clipResult.numTris;
                         Triangle[] clipped = clipResult.tris;
-
-                        System.out.println(nClippedTriangles);
-                        System.out.println(Arrays.toString(clipped));
 
                         for (int n = 0; n < nClippedTriangles; n++) {
 
@@ -225,19 +221,23 @@ public class Main {
                             triProjected.p[1] = Util.MatrixMultiplyVector(matProj, clipped[n].p[1]);
                             triProjected.p[2] = Util.MatrixMultiplyVector(matProj, clipped[n].p[2]);
                             triProjected.col = clipped[n].col;
-                            triProjected.t = clipped[n].t;
+                            triProjected.t = clipped[n].t.clone();
 
-//                            triProjected.t[0].u /= triProjected.p[0].w;
-//                            triProjected.t[1].u /= triProjected.p[1].w;
-//                            triProjected.t[2].u /= triProjected.p[2].w;
-//
-//                            triProjected.t[0].v = triProjected.t[0].v / triProjected.p[0].w;
-//                            triProjected.t[1].v = triProjected.t[1].v / triProjected.p[1].w;
-//                            triProjected.t[2].v = triProjected.t[2].v / triProjected.p[2].w;
+                            triProjected.t[0].u /= triProjected.p[0].w;
+                            triProjected.t[1].u /= triProjected.p[1].w;
+                            triProjected.t[2].u /= triProjected.p[2].w;
+
+                            triProjected.t[0].v /= triProjected.p[0].w;
+                            triProjected.t[1].v /= triProjected.p[1].w;
+                            triProjected.t[2].v /= triProjected.p[2].w;
 //
 //                            triProjected.t[0].w = 1.0f / triProjected.p[0].w;
 //                            triProjected.t[1].w = 1.0f / triProjected.p[1].w;
 //                            triProjected.t[2].w = 1.0f / triProjected.p[2].w;
+
+                            triProjected.t[0].setW(1.0f / triProjected.p[0].w);
+                            triProjected.t[1].setW(1.0f / triProjected.p[1].w);
+                            triProjected.t[2].setW(1.0f / triProjected.p[2].w);
 
                             // Scale into view, we moved the normalising into cartesian space
                             // out of the matrix.vector function from the previous video, so
@@ -328,15 +328,15 @@ public class Main {
 
                     // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
                     for (Triangle t : listTriangles) {
-                        g2d.setColor(t.col);
-                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
+//                        g2d.setColor(t.col);
+//                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
-//                        Util.TexturedTriangle(new ArrayList<>(Arrays.asList((int)t.p[0].x, (int)t.p[1].x, (int)t.p[2].x)),
-//                                            new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
-//                                            new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
-//                                            new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
-//                                            new ArrayList<>(Arrays.asList(t.t[0].w, t.t[1].w, t.t[2].w)),
-//                                            g2d, sprTex1);
+                        Util.TexturedTriangle(new ArrayList<>(Arrays.asList((int)t.p[0].x, (int)t.p[1].x, (int)t.p[2].x)),
+                                            new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
+                                            new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
+                                            new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
+                                            new ArrayList<>(Arrays.asList(t.t[0].getW(), t.t[1].getW(), t.t[2].getW())),
+                                            g2d, sprTex1);
 
                         g2d.setColor(Color.WHITE);
                         g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);

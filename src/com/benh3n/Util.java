@@ -247,7 +247,7 @@ public final class Util {
 
             // Copy appearance info to new Triangle
             outTri1.col = inTri.col;
-            outTri1.col = Color.BLUE;
+//            outTri1.col = Color.BLUE;
 
             // The inside point is valid, so keep that...
             outTri1.p[0] = insidePoints[0];
@@ -274,8 +274,8 @@ public final class Util {
             // Copy appearance info to new Triangles
             outTri1.col =  inTri.col;
             outTri2.col =  inTri.col;
-            outTri1.col = Color.GREEN;
-            outTri2.col = Color.RED;
+//            outTri1.col = Color.GREEN;
+//            outTri2.col = Color.RED;
 
             // The first Triangle consists of the two inside points and a new
             // point determined by the location where one side of the Triangle
@@ -387,10 +387,6 @@ public final class Util {
                     float temp4 = texSw; texSw = texEw; texEw = temp4;
                 }
 
-                texU = texSu;
-                texV = texSv;
-                texW = texSw;
-
                 float tStep = 1.0f / ((float) (bx - ax));
                 float t = 0.0f;
 
@@ -398,10 +394,8 @@ public final class Util {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
                     texW = (1.0f - t) * texSw + t * texEw;
-//                    System.out.println(texU + " " + texV + " " + texW);
-                    int texX = (tex.getWidth() - 1) - (int) ((texU) * (tex.getWidth() - 1));
-                    int texY = (int) ((texV) * (tex.getHeight() - 1));
-//                    System.out.println(texX + " " + texY);
+                    int texX = (tex.getWidth() - 1) - (int) ((texU / texW) * (tex.getWidth() - 1));
+                    int texY = (int) ((texV / texW) * (tex.getHeight() - 1));
                     int color = tex.getRGB(texX, texY);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
@@ -446,10 +440,6 @@ public final class Util {
                     float temp4 = texSw; texSw = texEw; texEw = temp4;
                 }
 
-                texU = texSu;
-                texV = texSv;
-                texW = texSw;
-
                 float tStep = 1.0f / ((float)(bx - ax));
                 float t = 0.0f;
 
@@ -457,8 +447,8 @@ public final class Util {
                     texU = (1.0f - t) * texSu + t * texEu;
                     texV = (1.0f - t) * texSv + t * texEv;
                     texW = (1.0f - t) * texSw + t * texEw;
-                    int texX = (tex.getWidth() - 1) - (int) ((texU) * (tex.getWidth() - 1));
-                    int texY = (int) ((texV) * (tex.getHeight() - 1));
+                    int texX = (tex.getWidth() - 1) - (int) ((texU / texW) * (tex.getWidth() - 1));
+                    int texY = (int) ((texV / texW) * (tex.getHeight() - 1));
                     int color = tex.getRGB(texX, texY);
                     g2d.setColor(new Color((color & 0xff0000) >> 16, (color & 0xff00) >> 8, color & 0xff));
                     g2d.drawLine(j, i, j, i);
