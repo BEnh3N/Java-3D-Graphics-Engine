@@ -34,8 +34,8 @@ public class Triangle implements Cloneable {
     public Triangle clone() {
         try {
             Triangle clone = (Triangle) super.clone();
-            clone.p = this.p;
-            clone.t = this.t;
+            clone.p = this.p.clone();
+            clone.t = this.t.clone();
             clone.col = this.col;
             return clone;
         } catch (CloneNotSupportedException e) {
