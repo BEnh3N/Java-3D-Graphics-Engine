@@ -13,15 +13,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.benh3n.Structs.*;
 import com.benh3n.Util.*;
+import com.benh3n.structs.Mesh;
+import com.benh3n.structs.Triangle;
+import com.benh3n.structs.Vec3D;
 
 public class Main {
 
-    static mesh meshCube = new mesh();
+    static Mesh meshCube = new Mesh();
     static mat4x4 matProj = new mat4x4();
-    static vec3D vCamera = new vec3D();
-    static vec3D vLookDir;
+    static Vec3D vCamera = new Vec3D();
+    static Vec3D vLookDir;
     static float fYaw;
     static float fTheta;
 
@@ -54,7 +56,7 @@ public class Main {
                 if (e.getKeyCode() == KeyEvent.VK_LEFT)
                     vCamera.x += 8.0f * elapsedTime;
 
-                vec3D vForward = Util.VectorMul(vLookDir, 8.0f * elapsedTime);
+                Vec3D vForward = Util.VectorMul(vLookDir, 8.0f * elapsedTime);
 
                 if (e.getKeyCode() == KeyEvent.VK_W)
                     vCamera = Util.VectorAdd(vCamera, vForward);
@@ -93,36 +95,33 @@ public class Main {
         Color background = Color.BLACK;
 
         // Load Object From File
-//        meshCube = mesh.loadObjectFromFile("mountains.obj");
 
         meshCube.tris = new ArrayList<>(Arrays.asList(
                 // SOUTH
-                new triangle(new float[]{0, 0, 0, 0, 1, 0, 1, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
-                new triangle(new float[]{0, 0, 0, 1, 1, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
+                new Triangle(new float[]{0, 0, 0, 0, 1, 0, 1, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
+                new Triangle(new float[]{0, 0, 0, 1, 1, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
                 // EAST
-                new triangle(new float[]{1, 0, 0, 1, 1, 0, 1, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
-                new triangle(new float[]{1, 0, 0, 1, 1, 1, 1, 0, 1}, new float[]{0, 1, 1, 0, 1, 1}),
+                new Triangle(new float[]{1, 0, 0, 1, 1, 0, 1, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
+                new Triangle(new float[]{1, 0, 0, 1, 1, 1, 1, 0, 1}, new float[]{0, 1, 1, 0, 1, 1}),
                 // NORTH
-                new triangle(new float[]{1, 0, 1, 1, 1, 1, 0, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
-                new triangle(new float[]{1, 0, 1, 0, 1, 1, 0, 0, 1}, new float[]{0, 1, 1, 0, 1, 1}),
+                new Triangle(new float[]{1, 0, 1, 1, 1, 1, 0, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
+                new Triangle(new float[]{1, 0, 1, 0, 1, 1, 0, 0, 1}, new float[]{0, 1, 1, 0, 1, 1}),
                 // WEST
-                new triangle(new float[]{0, 0, 1, 0, 1, 1, 0, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
-                new triangle(new float[]{0, 0, 1, 0, 1, 0, 0, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
+                new Triangle(new float[]{0, 0, 1, 0, 1, 1, 0, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
+                new Triangle(new float[]{0, 0, 1, 0, 1, 0, 0, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
                 // TOP
-                new triangle(new float[]{0, 1, 0, 0, 1, 1, 1, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
-                new triangle(new float[]{0, 1, 0, 1, 1, 1, 1, 1, 0}, new float[]{0, 1, 1, 0, 1, 1}),
+                new Triangle(new float[]{0, 1, 0, 0, 1, 1, 1, 1, 1}, new float[]{0, 1, 0, 0, 1, 0}),
+                new Triangle(new float[]{0, 1, 0, 1, 1, 1, 1, 1, 0}, new float[]{0, 1, 1, 0, 1, 1}),
                 // BOTTOM
-                new triangle(new float[]{1, 0, 1, 0, 0, 1, 0, 0, 0}, new float[]{0, 1, 0, 0, 1, 0}),
-                new triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
+                new Triangle(new float[]{1, 0, 1, 0, 0, 1, 0, 0, 0}, new float[]{0, 1, 0, 0, 1, 0}),
+                new Triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
         ));
 
-//        meshCube = mesh.loadObjectFromFile("mountains.obj");
+        meshCube = Mesh.loadObjectFromFile("axis.obj");
 
         try {
             sprTex1 = ImageIO.read(new File("rainbow.png"));
-        } catch (IOException e) {
-            System.out.println("brush");
-        }
+        } catch (IOException e) { System.out.println("brush"); }
 
         running = true;
         while (running) {
@@ -140,7 +139,7 @@ public class Main {
 
                 // Set up Rotation Matrices
                 mat4x4 matRotZ, matRotX;
-                fTheta += 0.15 * elapsedTime; // Uncomment to spin me right round baby
+//                fTheta += 0.15 * elapsedTime; // Uncomment to spin me right round baby
                 matRotZ = Util.MatrixMakeRotationZ(fTheta * 0.5f);
                 matRotX = Util.MatrixMakeRotationX(fTheta);
 
@@ -152,8 +151,8 @@ public class Main {
                 matWorld = Util.MatrixMultiplyMatrix(matRotZ, matRotX);
                 matWorld = Util.MatrixMultiplyMatrix(matWorld, matTrans);
 
-                vec3D vUp = new vec3D(0, 1, 0);
-                vec3D vTarget = new vec3D(0, 0, 1);
+                Vec3D vUp = new Vec3D(0, 1, 0);
+                Vec3D vTarget = new Vec3D(0, 0, 1);
                 mat4x4 matCameraRot = Util.MatrixMakeRotationY(fYaw);
                 vLookDir = Util.MatrixMultiplyVector(matCameraRot, vTarget);
                 vTarget = Util.VectorAdd(vCamera, vLookDir);
@@ -164,11 +163,11 @@ public class Main {
                 mat4x4 matView = Util.MatrixQuickInverse(matCamera);
 
                 // Store Triangles for Rastering Later
-                ArrayList<triangle> trianglesToRaster = new ArrayList<>();
+                ArrayList<Triangle> trianglesToRaster = new ArrayList<>();
 
                 // Draw Triangles
-                for (triangle tri : meshCube.tris) {
-                    triangle triProjected = new triangle(), triTransformed = new triangle(), triViewed = new triangle();
+                for (Triangle tri : meshCube.tris) {
+                    Triangle triProjected = new Triangle(), triTransformed = new Triangle(), triViewed = new Triangle();
 
                     triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
                     triTransformed.p[1] = Util.MatrixMultiplyVector(matWorld, tri.p[1]);
@@ -176,7 +175,7 @@ public class Main {
                     triTransformed.t = tri.t;
 
                     // Calculate Triangle Normal
-                    vec3D normal, line1, line2;
+                    Vec3D normal, line1, line2;
 
                     // Get lines either side of triangle
                     line1 = Util.VectorSub(triTransformed.p[1], triTransformed.p[0]);
@@ -189,13 +188,13 @@ public class Main {
                     normal = Util.VectorNormalise(normal);
 
                     // Get Ray from Triangle to Camera
-                    vec3D vCameraRay = Util.VectorSub(triTransformed.p[0], vCamera);
+                    Vec3D vCameraRay = Util.VectorSub(triTransformed.p[0], vCamera);
 
                     // If ray is aligned with normal, then triangle is visible
                     if(Util.VectorDotProduct(normal, vCameraRay) < 0.0f) {
 
                         // Illumination
-                        vec3D lightDirection = new vec3D(0, 1, -1);
+                        Vec3D lightDirection = new Vec3D(0, 1, -1);
                         lightDirection = Util.VectorNormalise(lightDirection);
 
                         // How "aligned" are light direction and triangle surface normal?
@@ -212,9 +211,12 @@ public class Main {
 
                         // Clip Viewed Triangle against near plane, this could form two additional
                         // triangles
-                        returnClip clipResult = Util.TriangleClipAgainstPlane(new vec3D(0.0f, 0.0f, 0.1f), new vec3D(0.0f, 0.0f, 1.0f), triViewed);
+                        returnClip clipResult = Util.TriangleClipAgainstPlane(new Vec3D(0.0f, 0.0f, 0.1f), new Vec3D(0.0f, 0.0f, 1.0f), triViewed);
                         int nClippedTriangles = clipResult.numTris;
-                        triangle[] clipped = clipResult.tris;
+                        Triangle[] clipped = clipResult.tris;
+
+                        System.out.println(nClippedTriangles);
+                        System.out.println(Arrays.toString(clipped));
 
                         for (int n = 0; n < nClippedTriangles; n++) {
 
@@ -253,7 +255,7 @@ public class Main {
                             triProjected.p[2].y *= -1.0f;
 
                             // Offset verts into visible normalised space
-                            vec3D vOffsetView = new vec3D(1, 1, 0);
+                            Vec3D vOffsetView = new Vec3D(1, 1, 0);
                             triProjected.p[0] = Util.VectorAdd(triProjected.p[0], vOffsetView);
                             triProjected.p[1] = Util.VectorAdd(triProjected.p[1], vOffsetView);
                             triProjected.p[2] = Util.VectorAdd(triProjected.p[2], vOffsetView);
@@ -270,19 +272,19 @@ public class Main {
                     }
                 }
 
-                Comparator<triangle> comp = (triangle t1, triangle t2) -> {
+                Comparator<Triangle> comp = (Triangle t1, Triangle t2) -> {
                     double z1 = (t1.p[0].z + t1.p[1].z + t1.p[2].z) / 3.0;
                     double z2 = (t2.p[0].z + t2.p[1].z + t2.p[2].z) / 3.0;
                     return Double.compare(z1, z2);
                 };
                 trianglesToRaster.sort(comp.reversed());
 
-                for (triangle triToRaster: trianglesToRaster) {
+                for (Triangle triToRaster: trianglesToRaster) {
 
                     // Clip triangles against all four screen edges, this could yield
                     // a bunch of triangles
-                    triangle[] clipped;
-                    ArrayList<triangle> listTriangles = new ArrayList<>();
+                    Triangle[] clipped;
+                    ArrayList<Triangle> listTriangles = new ArrayList<>();
 
                     // Add initial triangle
                     listTriangles.add(triToRaster);
@@ -294,7 +296,7 @@ public class Main {
                         while (nNewTriangles > 0) {
 
                             // Take triangle from front of queue
-                            triangle test = listTriangles.get(0);
+                            Triangle test = listTriangles.get(0);
                             listTriangles.remove(0);
                             nNewTriangles--;
 
@@ -306,10 +308,10 @@ public class Main {
                             returnClip clip = null;
 
                             switch (p) {
-                                case 0: clip = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(0, 1, 0), test); break;
-                                case 1: clip = Util.TriangleClipAgainstPlane(new vec3D(0, canvas.getHeight() - 1, 0), new vec3D(0, -1, 0), test); break;
-                                case 2: clip = Util.TriangleClipAgainstPlane(new vec3D(0, 0, 0), new vec3D(1, 0, 0), test); break;
-                                case 3: clip = Util.TriangleClipAgainstPlane(new vec3D(canvas.getWidth() - 1, 0, 0), new vec3D(-1, 0, 0), test); break;
+                                case 0: clip = Util.TriangleClipAgainstPlane(new Vec3D(0, 0, 0), new Vec3D(0, 1, 0), test); break;
+                                case 1: clip = Util.TriangleClipAgainstPlane(new Vec3D(0, canvas.getHeight() - 1, 0), new Vec3D(0, -1, 0), test); break;
+                                case 2: clip = Util.TriangleClipAgainstPlane(new Vec3D(0, 0, 0), new Vec3D(1, 0, 0), test); break;
+                                case 3: clip = Util.TriangleClipAgainstPlane(new Vec3D(canvas.getWidth() - 1, 0, 0), new Vec3D(-1, 0, 0), test); break;
                                 default: break;
                             }
                             nTrisToAdd = clip.numTris;
@@ -325,16 +327,16 @@ public class Main {
                     }
 
                     // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
-                    for (triangle t : listTriangles) {
-//                        g2d.setColor(t.col);
-//                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
+                    for (Triangle t : listTriangles) {
+                        g2d.setColor(t.col);
+                        g2d.fillPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);
 
-                        Util.TexturedTriangle(new ArrayList<>(Arrays.asList((int)t.p[0].x, (int)t.p[1].x, (int)t.p[2].x)),
-                                            new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
-                                            new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
-                                            new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
-                                            new ArrayList<>(Arrays.asList(t.t[0].w, t.t[1].w, t.t[2].w)),
-                                            g2d, sprTex1);
+//                        Util.TexturedTriangle(new ArrayList<>(Arrays.asList((int)t.p[0].x, (int)t.p[1].x, (int)t.p[2].x)),
+//                                            new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
+//                                            new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
+//                                            new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
+//                                            new ArrayList<>(Arrays.asList(t.t[0].w, t.t[1].w, t.t[2].w)),
+//                                            g2d, sprTex1);
 
                         g2d.setColor(Color.WHITE);
                         g2d.drawPolygon(new int[]{(int) t.p[0].x, (int) t.p[1].x, (int) t.p[2].x}, new int[]{(int) t.p[0].y, (int) t.p[1].y, (int) t.p[2].y}, 3);

@@ -5,7 +5,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.benh3n.Structs.*;
+import com.benh3n.structs.Triangle;
+import com.benh3n.structs.Vec2D;
+import com.benh3n.structs.Vec3D;
 
 public final class Util {
     private Util() {
@@ -16,15 +18,15 @@ public final class Util {
     }
     public static class returnClip {
         int numTris;
-        triangle[] tris;
-        public returnClip(int numTris, triangle[] tris) {
+        Triangle[] tris;
+        public returnClip(int numTris, Triangle[] tris) {
             this.numTris = numTris;
             this.tris = tris;
         }
     }
 
-    public static vec3D MatrixMultiplyVector(mat4x4 m, vec3D i) {
-        vec3D v = new vec3D();
+    public static Vec3D MatrixMultiplyVector(mat4x4 m, Vec3D i) {
+        Vec3D v = new Vec3D();
         v.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + i.w * m.m[3][0];
         v.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + i.w * m.m[3][1];
         v.z = i.x * m.m[0][2] + i.y * m.m[1][2] + i.z * m.m[2][2] + i.w * m.m[3][2];
@@ -101,18 +103,18 @@ public final class Util {
         }
         return matrix;
     }
-    public static mat4x4 MatrixPointAt(vec3D pos, vec3D target, vec3D up) {
+    public static mat4x4 MatrixPointAt(Vec3D pos, Vec3D target, Vec3D up) {
         // Calculate new forward direction
-        vec3D newForward = VectorSub(target, pos);
+        Vec3D newForward = VectorSub(target, pos);
         newForward = VectorNormalise(newForward);
 
         // Calculate new up direction
-        vec3D a = VectorMul(newForward, VectorDotProduct(up, newForward));
-        vec3D newUp = VectorSub(up, a);
+        Vec3D a = VectorMul(newForward, VectorDotProduct(up, newForward));
+        Vec3D newUp = VectorSub(up, a);
         newUp = VectorNormalise(newUp);
 
         // New Right direction is easy, its just cross product
-        vec3D newRight = VectorCrossProduct(newUp, newForward);
+        Vec3D newRight = VectorCrossProduct(newUp, newForward);
 
         // Construct Dimensioning and Translation Matrix
         mat4x4 matrix = new mat4x4();
@@ -134,73 +136,71 @@ public final class Util {
         return matrix;
     }
 
-    public static vec3D VectorAdd(vec3D v1, vec3D v2) {
-        return new vec3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    public static Vec3D VectorAdd(Vec3D v1, Vec3D v2) {
+        return new Vec3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     }
-    public static vec3D VectorSub(vec3D v1, vec3D v2) {
-        return new vec3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    public static Vec3D VectorSub(Vec3D v1, Vec3D v2) {
+        return new Vec3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     }
-    public static vec3D VectorMul(vec3D v1, float k) {
-        return new vec3D(v1.x * k, v1.y * k, v1.z * k);
+    public static Vec3D VectorMul(Vec3D v1, float k) {
+        return new Vec3D(v1.x * k, v1.y * k, v1.z * k);
     }
-    public static vec3D VectorDiv(vec3D v1, float k) {
-        return new vec3D(v1.x / k, v1.y / k, v1.z / k );
+    public static Vec3D VectorDiv(Vec3D v1, float k) {
+        return new Vec3D(v1.x / k, v1.y / k, v1.z / k );
     }
-    public static float VectorDotProduct(vec3D v1, vec3D v2) {
+    public static float VectorDotProduct(Vec3D v1, Vec3D v2) {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
-    public static float VectorLength(vec3D v) {
+    public static float VectorLength(Vec3D v) {
         return (float) Math.sqrt(VectorDotProduct(v, v));
     }
-    public static vec3D VectorNormalise(vec3D v) {
+    public static Vec3D VectorNormalise(Vec3D v) {
         float l = VectorLength(v);
-        return new vec3D(v.x / l, v.y / l, v.z / l);
+        return new Vec3D(v.x / l, v.y / l, v.z / l);
     }
-    public static vec3D VectorCrossProduct(vec3D v1, vec3D v2) {
-        vec3D v = new vec3D();
+    public static Vec3D VectorCrossProduct(Vec3D v1, Vec3D v2) {
+        Vec3D v = new Vec3D();
         v.x = v1.y * v2.z - v1.z * v2.y;
         v.y = v1.z * v2.x - v1.x * v2.z;
         v.z = v1.x * v2.y - v1.y * v2.x;
         return v;
     }
-    public static vec3D VectorIntersectPlane(vec3D planeP, vec3D planeN, vec3D lineStart, vec3D lineEnd, float[] t) {
+    public static Vec3D VectorIntersectPlane(Vec3D planeP, Vec3D planeN, Vec3D lineStart, Vec3D lineEnd, float[] t) {
         planeN = VectorNormalise(planeN);
         float planeD = -VectorDotProduct(planeN, planeP);
         float ad = VectorDotProduct(lineStart, planeN);
         float bd = VectorDotProduct(lineEnd, planeN);
         t[0] = (-planeD - ad) / (bd - ad);
-        vec3D lineStartToEnd = VectorSub(lineEnd, lineStart);
-        vec3D lineToIntersect = VectorMul(lineStartToEnd, t[0]);
+        Vec3D lineStartToEnd = VectorSub(lineEnd, lineStart);
+        Vec3D lineToIntersect = VectorMul(lineStartToEnd, t[0]);
         return VectorAdd(lineStart, lineToIntersect);
     }
 
     interface Dist {
-        float dist(vec3D p);
+        float dist(Vec3D p);
     }
-    public static returnClip TriangleClipAgainstPlane(vec3D planeP, vec3D planeN, triangle inTri) {
-        triangle outTri1 = new triangle();
-        triangle outTri2 = new triangle();
+    public static returnClip TriangleClipAgainstPlane(Vec3D planeP, Vec3D planeN, Triangle inTri) {
+        Triangle outTri1 = new Triangle();
+        Triangle outTri2 = new Triangle();
 
         // Make sure plane normal is indeed normal
         planeN = VectorNormalise(planeN);
 
         // Return signed shortest distance from point to plane, place normal must be normalised
-        vec3D finalPlaneN = planeN;
-        Dist d = (vec3D p) -> {
-            // vec3D n = VectorNormalise(p);
+        Vec3D finalPlaneN = planeN;
+        Dist d = (Vec3D p) -> {
+            // Vec3D n = VectorNormalise(p);
             return finalPlaneN.x * p.x + finalPlaneN.y * p.y + finalPlaneN.z * p.z - VectorDotProduct(finalPlaneN, planeP);
         };
 
         // Create two temporary storage arrays to classify points either side of plane
         // If distance sign is positive, point lies on "inside" of plane
-        vec3D[] insidePoints  = new vec3D[3]; int nInsidePointCount  = 0;
-        vec3D[] outsidePoints = new vec3D[3]; int nOutsidePointCount = 0;
-        vec2D[] insideTex  = new vec2D[3];
-        vec2D[] outsideTex = new vec2D[3];
+        Vec3D[] insidePoints  = new Vec3D[3]; int nInsidePointCount  = 0;
+        Vec3D[] outsidePoints = new Vec3D[3]; int nOutsidePointCount = 0;
+        Vec2D[] insideTex  = new Vec2D[3];
+        Vec2D[] outsideTex = new Vec2D[3];
 
-
-
-        // Get signed distance of each point in triangle to plane
+        // Get signed distance of each point in Triangle to plane
         float d0 = d.dist(inTri.p[0]);
         float d1 = d.dist(inTri.p[1]);
         float d2 = d.dist(inTri.p[2]);
@@ -224,37 +224,37 @@ public final class Util {
             outsidePoints[nOutsidePointCount] = inTri.p[2]; outsideTex[nOutsidePointCount++] = inTri.t[2];
         }
 
-        // Now classify triangle points, and break the input triangle into
-        // smaller output triangles if required. There are four possible
+        // Now classify Triangle points, and break the input Triangle into
+        // smaller output Triangles if required. There are four possible
         // outcomes...
 
         if (nInsidePointCount == 0) {
-            // All points lie on the outside of plane, so clip whole triangle
+            // All points lie on the outside of plane, so clip whole Triangle
             // It ceases to exist
 
-            return new returnClip(0, new triangle[]{null, null}); // No returned triangles are valid
+            return new returnClip(0, new Triangle[]{null, null}); // No returned Triangles are valid
 
         } else if (nInsidePointCount == 3) {
             // All points lie on the inside of plane, so do nothing
-            // and allow the triangle to simply pass through
+            // and allow the Triangle to simply pass through
             outTri1 = inTri;
 
-            return new returnClip(1, new triangle[]{outTri1.clone(), null}); // Just the one returned original triangle is valid
+            return new returnClip(1, new Triangle[]{outTri1.clone(), null}); // Just the one returned original Triangle is valid
 
         } else if (nOutsidePointCount == 2) {
             // Triangle should be clipped. As two points lie outside
-            // the plane, the triangle simply becomes a smaller triangle
+            // the plane, the Triangle simply becomes a smaller Triangle
 
-            // Copy appearance info to new triangle
+            // Copy appearance info to new Triangle
             outTri1.col = inTri.col;
-//            outTri1.col = Color.BLUE;
+            outTri1.col = Color.BLUE;
 
             // The inside point is valid, so keep that...
             outTri1.p[0] = insidePoints[0];
             outTri1.t[0] = insideTex[0];
 
             // but the two new points are at the locations where the
-            // original sides of the triangle (lines) intersect with the plane
+            // original sides of the Triangle (lines) intersect with the plane
             float[] t = {0};
             outTri1.p[1] = VectorIntersectPlane(planeP, planeN, insidePoints[0], outsidePoints[0], t);
             outTri1.t[1].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
@@ -264,21 +264,21 @@ public final class Util {
             outTri1.t[2].u = t[0] * (outsideTex[1].u - insideTex[0].u) + insideTex[0].u;
             outTri1.t[2].v = t[0] * (outsideTex[1].v - insideTex[0].v) + insideTex[0].v;
 
-            return new returnClip(1, new triangle[]{outTri1.clone(), null}); // Return the newly formed single triangle
+            return new returnClip(1, new Triangle[]{outTri1, null}); // Return the newly formed single Triangle
 
         } else {
             // Triangle should be clipped. As two points lie inside the plane,
-            // the clipped triangle becomes a "quad". Fortunately, we can
-            // represent a quad with two new triangles
+            // the clipped Triangle becomes a "quad". Fortunately, we can
+            // represent a quad with two new Triangles
 
-            // Copy appearance info to new triangles
+            // Copy appearance info to new Triangles
             outTri1.col =  inTri.col;
             outTri2.col =  inTri.col;
-//            outTri1.col = Color.GREEN;
-//            outTri2.col = Color.RED;
+            outTri1.col = Color.GREEN;
+            outTri2.col = Color.RED;
 
-            // The first triangle consists of the two inside points and a new
-            // point determined by the location where one side of the triangle
+            // The first Triangle consists of the two inside points and a new
+            // point determined by the location where one side of the Triangle
             // intersects with the plane
             outTri1.p[0] = insidePoints[0];
             outTri1.p[1] = insidePoints[1];
@@ -290,9 +290,9 @@ public final class Util {
             outTri1.t[2].u = t[0] * (outsideTex[0].u - insideTex[0].u) + insideTex[0].u;
             outTri1.t[2].v = t[0] * (outsideTex[0].v - insideTex[0].v) + insideTex[0].v;
 
-            // The second triangle is composed of one of the inside points, a
+            // The second Triangle is composed of one of the inside points, a
             // new point determined by the intersection of the other side of the
-            // triangle and the plane, and the newly created point above
+            // Triangle and the plane, and the newly created point above
             outTri2.p[0] = insidePoints[1];
             outTri2.t[0] = insideTex[1];
             outTri2.p[1] = outTri1.p[2];
@@ -301,7 +301,7 @@ public final class Util {
             outTri2.t[2].u = t[0] * (outsideTex[0].u - insideTex[1].u) + insideTex[1].u;
             outTri2.t[2].v = t[0] * (outsideTex[0].v - insideTex[1].v) + insideTex[1].v;
 
-            return new returnClip(2, new triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
+            return new returnClip(2, new Triangle[]{outTri1, outTri2}); // Return two newly formed triangles which form a quad
         }
     }
 
