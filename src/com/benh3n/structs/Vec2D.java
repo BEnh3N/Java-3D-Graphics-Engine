@@ -3,7 +3,7 @@ package com.benh3n.structs;
 public class Vec2D implements Cloneable {
     public float u = 0.0f;
     public float v = 0.0f;
-    private float w = 1.0f;
+    public float w = 1.0f;
 
     public Vec2D() {
 
@@ -29,13 +29,5 @@ public class Vec2D implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
-    }
-
-    public float getW() {
-        return w;
-    }
-
-    public void setW(float w) {
-        this.w = w;
     }
 }

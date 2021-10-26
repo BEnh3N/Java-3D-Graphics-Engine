@@ -164,8 +164,13 @@ public class Main {
                 ArrayList<Triangle> trianglesToRaster = new ArrayList<>();
 
                 // Draw Triangles
-                for (Triangle tri : meshCube.tris) {
-                    System.out.println(meshCube.tris);
+//                for (Triangle tri : meshCube.tris) {
+                for (int t = 0; t < meshCube.tris.size(); t++) {
+                    Triangle tri = meshCube.tris.get(t).clone();
+
+                    if (tri.t[0].w != 1.0f || tri.t[1].w != 1.0f || tri.t[2].w != 1.0f)
+                        System.out.println(tri);
+
                     Triangle triProjected = new Triangle(), triTransformed = new Triangle(), triViewed = new Triangle();
 
                     triTransformed.p[0] = Util.MatrixMultiplyVector(matWorld, tri.p[0]);
@@ -230,14 +235,10 @@ public class Main {
                             triProjected.t[0].v /= triProjected.p[0].w;
                             triProjected.t[1].v /= triProjected.p[1].w;
                             triProjected.t[2].v /= triProjected.p[2].w;
-//
-//                            triProjected.t[0].w = 1.0f / triProjected.p[0].w;
-//                            triProjected.t[1].w = 1.0f / triProjected.p[1].w;
-//                            triProjected.t[2].w = 1.0f / triProjected.p[2].w;
 
-                            triProjected.t[0].setW(1.0f / triProjected.p[0].w);
-                            triProjected.t[1].setW(1.0f / triProjected.p[1].w);
-                            triProjected.t[2].setW(1.0f / triProjected.p[2].w);
+                            triProjected.t[0].w = 1.0f / triProjected.p[0].w;
+                            triProjected.t[1].w = 1.0f / triProjected.p[1].w;
+                            triProjected.t[2].w = 1.0f / triProjected.p[2].w;
 
                             // Scale into view, we moved the normalising into cartesian space
                             // out of the matrix.vector function from the previous video, so
@@ -335,7 +336,7 @@ public class Main {
                                             new ArrayList<>(Arrays.asList((int)t.p[0].y, (int)t.p[1].y, (int)t.p[2].y)),
                                             new ArrayList<>(Arrays.asList(t.t[0].u, t.t[1].u, t.t[2].u)),
                                             new ArrayList<>(Arrays.asList(t.t[0].v, t.t[1].v, t.t[2].v)),
-                                            new ArrayList<>(Arrays.asList(t.t[0].getW(), t.t[1].getW(), t.t[2].getW())),
+                                            new ArrayList<>(Arrays.asList(t.t[0].w, t.t[1].w, t.t[2].w)),
                                             g2d, sprTex1);
 
                         g2d.setColor(Color.WHITE);

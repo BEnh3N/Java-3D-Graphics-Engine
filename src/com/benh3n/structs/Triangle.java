@@ -1,7 +1,6 @@
 package com.benh3n.structs;
 
 import java.awt.*;
-import java.util.Arrays;
 
 public class Triangle implements Cloneable {
     public Vec3D[] p = new Vec3D[]{new Vec3D(), new Vec3D(), new Vec3D()};
@@ -27,8 +26,8 @@ public class Triangle implements Cloneable {
         };
     }
     public String toString() {
-        return p[0] + "\n" + p[1] + "\n" + p[2] + "\n" + col + "\n"
-                + t[0] + "\n" + t[1] + "\n" + t[2] + "\n";
+        return this.p[0] + "\n" + this.p[1] + "\n" + this.p[2] + "\n" + this.col + "\n"
+                + this.t[0] + "\n" + this.t[1] + "\n" + this.t[2] + "\n";
     }
 
     @Override
