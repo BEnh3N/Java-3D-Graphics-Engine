@@ -20,7 +20,7 @@ import com.benh3n.structs.Vec3D;
 
 public class Main {
 
-    static Mesh meshCube = new Mesh();
+//    static final Mesh meshCube = new Mesh();
     static mat4x4 matProj = new mat4x4();
     static Vec3D vCamera = new Vec3D();
     static Vec3D vLookDir;
@@ -96,7 +96,7 @@ public class Main {
 
         // Load Object From File
 
-        meshCube.tris = new ArrayList<>(Arrays.asList(
+        final Mesh meshCube = new Mesh(new ArrayList<>(Arrays.asList(
                 // SOUTH
                 new Triangle(new float[]{0, 0, 0, 0, 1, 0, 1, 1, 0}, new float[]{0, 1, 0, 0, 1, 0}),
                 new Triangle(new float[]{0, 0, 0, 1, 1, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1}),
@@ -115,7 +115,7 @@ public class Main {
                 // BOTTOM
                 new Triangle(new float[]{1, 0, 1, 0, 0, 1, 0, 0, 0}, new float[]{0, 1, 0, 0, 1, 0}),
                 new Triangle(new float[]{1, 0, 1, 0, 0, 0, 1, 0, 0}, new float[]{0, 1, 1, 0, 1, 1})
-        ));
+        )));
 
         try {
             sprTex1 = ImageIO.read(new File("rainbow.png"));
@@ -164,12 +164,7 @@ public class Main {
                 ArrayList<Triangle> trianglesToRaster = new ArrayList<>();
 
                 // Draw Triangles
-//                for (Triangle tri : meshCube.tris) {
-                for (int t = 0; t < meshCube.tris.size(); t++) {
-                    Triangle tri = meshCube.tris.get(t).clone();
-
-                    if (tri.t[0].w != 1.0f || tri.t[1].w != 1.0f || tri.t[2].w != 1.0f)
-                        System.out.println(tri);
+                for (Triangle tri : meshCube.getTris()) {
 
                     Triangle triProjected = new Triangle(), triTransformed = new Triangle(), triViewed = new Triangle();
 
